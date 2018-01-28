@@ -30,9 +30,6 @@
     <ClCompile Include="SoundObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SoundDescription.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AudioFader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

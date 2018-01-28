@@ -7,9 +7,9 @@
 class SoundFactory
 {
 public:
-    static sf::SoundSource* Create(const SoundDescription::SoundType sound)
+    static sf::SoundSource* Create(const SoundDescription::SoundType soundType)
     {
-        const auto ctor = mCreator.find(sound);
+        const auto ctor = mCreator.find(soundType);
         if (ctor != mCreator.end())
             return ctor->second();
 
@@ -20,7 +20,7 @@ private:
     SoundFactory()
     {
         mCreator[SoundDescription::SoundType::STREAM] = []() {return new sf::Music(); };
-        mCreator[SoundDescription::SoundType::SFX] = []() {return new sf::Sound(); };
+        mCreator[SoundDescription::SoundType::SFX]    = []() {return new sf::Sound(); };
         //mCreator[SoundDescription::SoundType::OSC] = []() {return new sf::Sound(); };
     }
 

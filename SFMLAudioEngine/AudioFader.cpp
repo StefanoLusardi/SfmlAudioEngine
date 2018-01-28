@@ -1,17 +1,15 @@
 #include "AudioFader.h"
 
-
-
-AudioFader::AudioFader()
+AudioFader::AudioFader(const double initialVolume, const double targetVolume, const double deltaTime)
 {
+    Reset(initialVolume, targetVolume, deltaTime);
 }
-
 
 AudioFader::~AudioFader()
 {
 }
 
-void AudioFader::Init(const float initialVolume, const float targetVolume, const float deltaTime)
+void AudioFader::Reset(const double initialVolume, const double targetVolume, const double deltaTime)
 {
     mInitialVolume = initialVolume;
     mTargetVolume = targetVolume;
@@ -19,9 +17,9 @@ void AudioFader::Init(const float initialVolume, const float targetVolume, const
     mDeltaTime = deltaTime;
 }
 
-float AudioFader::GetValue(const float elapsedTime) const
+double AudioFader::GetValue(const double elapsedTime) const
 {
-    // Linear interpolator: y = ((y1-y0)/(x1-x0))*(x-x0)-y0 (here x0 is always 0)
+    // Linear interpolator: y = ((y1-y0)/(x1-x0))*(x-x0)+y0 (here x0 is always 0)
     // The formula holds both constant and non-constant time increment (no fixed time step)
-    return (mDeltaVolume / mDeltaTime) * elapsedTime - mInitialVolume;
+    return (mDeltaVolume / mDeltaTime) * elapsedTime + mInitialVolume;
 }

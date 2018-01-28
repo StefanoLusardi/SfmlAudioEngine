@@ -2,15 +2,16 @@
 class AudioFader
 {
 public:
-    AudioFader();
+    AudioFader(const double initialVolume, const double targetVolume, const double deltaTime);
     ~AudioFader();
-    void Init(const float initialVolume, const float targetVolume, const float deltaTime);
-    float GetValue(const float elapsedTime) const;
+
+    void Reset(const double initialVolume, const double targetVolume, const double deltaTime);
+    double GetValue(const double elapsedTime) const;
 
 private:
-    float mInitialVolume;
-    float mTargetVolume;
-    float mDeltaVolume;
-    float mDeltaTime;
+    double mInitialVolume;
+    double mTargetVolume;
+    double mDeltaVolume;
+    double mDeltaTime;
 };
 

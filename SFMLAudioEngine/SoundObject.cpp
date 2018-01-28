@@ -8,8 +8,19 @@ SoundObject::SoundObject(const SoundDescription description)
 , mSoundSource(nullptr)
 {
     mSoundSource = SoundFactory::Create(mDescription.mSoundType);
+    //mSoundBuffer->loadFromStream();
 }
 
 SoundObject::~SoundObject()
+{
+    delete mSoundSource;
+    delete mSoundBuffer;
+}
+
+void SoundObject::Play()
+{
+}
+
+void SoundObject::Stop()
 {
 }

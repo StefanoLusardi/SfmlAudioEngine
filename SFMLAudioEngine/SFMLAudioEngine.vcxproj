@@ -135,7 +135,6 @@
     <ClCompile Include="AudioFader.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SoundDescription.cpp" />
     <ClCompile Include="SoundInstance.cpp" />
     <ClCompile Include="SoundObject.cpp" />
   </ItemGroup>

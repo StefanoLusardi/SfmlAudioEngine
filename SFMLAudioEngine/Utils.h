@@ -4,8 +4,8 @@ namespace AudioUtils
 {
     struct Vector3d
     {
-        float x;
-        float y;
-        float z;
+        double x;
+        double y;
+        double z;
     };
 }

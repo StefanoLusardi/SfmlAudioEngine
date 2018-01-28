@@ -5,15 +5,14 @@ struct SoundDescription
 {
     enum class SoundType {SFX, STREAM, OSC};
 
-    SoundDescription();
-    ~SoundDescription();
+    SoundDescription() = default;
+    ~SoundDescription() = default;
 
     std::string mSoundName;
     SoundType mSoundType;
-    float mDefaultVolume;
-    float mMinDistance;
-    float mMaxDistance;
+    double mDefaultVolume;
+    double mMinDistance;
+    double mMaxDistance;
     bool  mIsLoop;
     bool  mIs3d;
 };
-

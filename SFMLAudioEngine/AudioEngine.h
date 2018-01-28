@@ -7,16 +7,25 @@ class AudioEngine
 {
 public:
     AudioEngine();
-    ~AudioEngine();
+    ~AudioEngine() = default;
+    
     void LoadSound(const SoundId id);
     void UnloadSound(const SoundId id);
-    void CreateSoundObject(const SoundDescription description);
-    void Update(float updateTime);
-    void PlaySoundObject();
 
-    //private:
-    SoundId mNextSoundId;
+    void PlaySound(const SoundId id, const Vector3d& position, const double volume);
+    void StopSound(const SoundId id, const double fadeoutMilliseconds);
+    void PauseSound(const SoundId id);
+    
+    void CreateSoundObject(const SoundDescription description);
+    void Update(const double updateTime);
+
+    // void StopAllSounds();
+    // bool IsPlaying(const SoundId id);
+    // bool IsLoaded(const SoundId id);
+
+private:
+    SoundId mNextInstanceId;
     std::map<const SoundId, SoundDescription> mSounds;
-    std::map<const SoundId, SoundInstance> mInstances;
+    std::map<const SoundId, std::unique_ptr<SoundInstance>> mInstances;
 };
 
