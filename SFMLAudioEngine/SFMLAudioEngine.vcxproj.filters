@@ -27,9 +27,6 @@
     <ClCompile Include="SoundInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SoundObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AudioFader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -44,9 +41,6 @@
     <ClInclude Include="SoundInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SoundObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SoundDescription.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,6 +51,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SoundFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Oscillator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ISoundSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

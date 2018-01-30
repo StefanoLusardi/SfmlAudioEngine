@@ -1,6 +1,5 @@
 #include "AudioEngine.h"
-
-
+#include <vector>
 
 AudioEngine::AudioEngine()
 {
@@ -8,6 +7,9 @@ AudioEngine::AudioEngine()
 
 void AudioEngine::LoadSound(const SoundId id)
 {
+    // Check if a sound source is already loaded in the mSoundSources map
+    // if so return, otherwise create a sound source to be later used by a sound instance
+
     //if (IsLoaded(id)) return;
 
     const auto sound = mSounds.find(id);
@@ -15,7 +17,7 @@ void AudioEngine::LoadSound(const SoundId id)
         return;
 
     mSounds[id] = SoundDescription();
-    //CreateSoundObject(sound->second);
+    //CreateSoundSource(sound->second);
 }
 
 void AudioEngine::UnloadSound(const SoundId id)
@@ -28,7 +30,7 @@ void AudioEngine::UnloadSound(const SoundId id)
     mSounds.erase(sound);
 }
 
-void AudioEngine::CreateSoundObject(const SoundDescription description)
+void AudioEngine::CreateSoundSource(const SoundDescription description)
 {
 }
 

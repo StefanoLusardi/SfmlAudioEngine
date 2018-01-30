@@ -136,16 +136,18 @@
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SoundInstance.cpp" />
-    <ClCompile Include="SoundObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="AudioFader.h" />
     <ClInclude Include="AudioManager.h" />
+    <ClInclude Include="ISoundSource.h" />
+    <ClInclude Include="Oscillator.h" />
     <ClInclude Include="SoundDescription.h" />
+    <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="SoundFactory.h" />
     <ClInclude Include="SoundInstance.h" />
-    <ClInclude Include="SoundObject.h" />
+    <ClInclude Include="SoundStream.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

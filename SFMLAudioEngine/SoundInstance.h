@@ -1,9 +1,11 @@
 #pragma once
-#include "Utils.h"
-#include "SoundObject.h"
-#include "AudioFader.h"
-#include "SoundDescription.h"
+
 #include <memory>
+
+#include "Utils.h"
+#include "AudioFader.h"
+#include "ISoundSource.h"
+#include "SoundDescription.h"
 
 using SoundId = int;
 using namespace AudioUtils;
@@ -29,7 +31,8 @@ public:
     SoundState GetState() const;
 
 private:
-    std::unique_ptr<SoundObject> mSoundObject;
+    //std::unique_ptr<SoundObject> mSoundObject;
+    std::unique_ptr<ISoundSource> mSoundSource;
     std::unique_ptr<AudioFader> mFader;
     SoundDescription mSoundDescription;
     SoundId mSoundId;

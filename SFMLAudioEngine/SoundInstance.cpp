@@ -1,5 +1,8 @@
 #include "SoundInstance.h"
-#include <memory>
+#include "SoundFactory.h"
+
+// Initialize SoundFactory static map of SoundSource constructors
+std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>()>> SoundFactory::mCreator = {};
 
 SoundInstance::SoundInstance(const AudioEngine& engine, const SoundId id, const SoundDescription description, const Vector3d& position, const double volume)
 : mSoundId{id}
@@ -7,7 +10,8 @@ SoundInstance::SoundInstance(const AudioEngine& engine, const SoundId id, const 
 , mVolume{volume}
 , mStopRequest{false}
 {
-    mSoundObject = std::make_unique<SoundObject>(description);
+    //mSoundObject = std::make_unique<SoundObject>(description);
+    mSoundSource = SoundFactory::Create(mSoundDescription.mSoundType);
     mFader       = std::make_unique<AudioFader>(1, 1, 1);
 }
 
@@ -37,12 +41,12 @@ SoundInstance::SoundState SoundInstance::GetState() const
 
 void SoundInstance::Play()
 {
-    mSoundObject->Play();
+    mSoundSource->Play();
 }
 
 void SoundInstance::Stop()
 {
-    mSoundObject->Stop();
+    mSoundSource->Stop();
 }
 
 void SoundInstance::Update(const double updateTime)

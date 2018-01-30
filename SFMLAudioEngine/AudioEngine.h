@@ -16,7 +16,7 @@ public:
     void StopSound(const SoundId id, const double fadeoutMilliseconds);
     void PauseSound(const SoundId id);
     
-    void CreateSoundObject(const SoundDescription description);
+    void CreateSoundSource(const SoundDescription description);
     void Update(const double updateTime);
 
     // void StopAllSounds();
@@ -26,6 +26,7 @@ public:
 private:
     SoundId mNextInstanceId;
     std::map<const SoundId, SoundDescription> mSounds;
+    std::map<const std::string, std::shared_ptr<ISoundSource>> mSoundSources;
     std::map<const SoundId, std::unique_ptr<SoundInstance>> mInstances;
 };
 
