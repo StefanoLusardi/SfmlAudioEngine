@@ -6,7 +6,7 @@ class SoundFactory;
 
 class SoundStream : public ISoundSource
 {
-    friend SoundFactory;
+    friend class SoundFactory;
 
 public:
     ~SoundStream() override
@@ -29,12 +29,16 @@ public:
         mMusic->pause();
     }
 
-//protected:
-    SoundStream() { }
+private:
+    SoundStream(const std::string soundPath)
+    {
+        mMusic = new sf::Music();
+        mMusic->openFromFile(soundPath + ".wav");
+    }
+
     SoundStream(sf::Music *sound)
     : mMusic{ sound }
     { }
 
-private:
     sf::Music *mMusic;
 };

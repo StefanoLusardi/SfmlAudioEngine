@@ -5,8 +5,33 @@ AudioManager::AudioManager()
 {
 }
 
+AudioManager::AudioManager(const PolyphonyManager& polyphonyManager)
+: mAudioEngine(new AudioEngine(polyphonyManager), [](AudioEngine *audioEngine) {delete audioEngine; })
+{
+}
+
 AudioManager::~AudioManager()
 {
+}
+
+void AudioManager::RegisterSounds(const std::vector<SoundDescription>& descriptions) const
+{
+    mAudioEngine->RegisterSounds(descriptions);
+}
+
+void AudioManager::RegisterSound(const SoundDescription& description) const
+{
+    mAudioEngine->RegisterSound(description);
+}
+
+void AudioManager::UnregisterSound(const std::string soundName) const
+{
+    mAudioEngine->UnregisterSound(soundName);
+}
+
+void AudioManager::UnregisterSounds() const
+{
+    mAudioEngine->UnregisterSounds();
 }
 
 void AudioManager::Update(const double updateTime) const
@@ -14,39 +39,27 @@ void AudioManager::Update(const double updateTime) const
     mAudioEngine->Update(updateTime);
 }
 
-//void AudioManager::RegisterSound(const SoundId id, const SoundDescription& description) const
-//{
-    //mAudioEngine->mSounds[id] = description;
-//}
-
-//void AudioManager::UnregisterSound(const SoundId id) const
-//{
-    //const auto sound = mAudioEngine->mSounds.find(id);
-    //if (sound != mAudioEngine->mSounds.end())
-    //    mAudioEngine->mSounds.erase(sound);
-//}
-
-void AudioManager::LoadSound(const SoundId id) const
+void AudioManager::LoadSound(const std::string soundName) const
 {
-    mAudioEngine->LoadSound(id);    
+    mAudioEngine->LoadSound(soundName);    
 }
 
-void AudioManager::UnloadSound(const SoundId id) const
+void AudioManager::UnloadSound(const std::string soundName) const
 {
-    mAudioEngine->UnloadSound(id);
+    mAudioEngine->UnloadSound(soundName);
 }
 
-void AudioManager::PlaySound(const SoundId id, const Vector3d& position, const double volume) const
+void AudioManager::PlaySound(const std::string soundName, const Vector3d& position, const double volume) const
 {
-    mAudioEngine->PlaySound(id, position, volume);
+    mAudioEngine->PlaySound(soundName, position, volume);
 }
 
-void AudioManager::StopSound(const SoundId id, const double fadeoutMilliseconds) const
+void AudioManager::StopSound(const std::string soundName, const double fadeoutMilliseconds) const
 {
-    mAudioEngine->StopSound(id, fadeoutMilliseconds);
+    mAudioEngine->StopSound(soundName, fadeoutMilliseconds);
 }
 
-void AudioManager::PauseSound(const SoundId id) const
+void AudioManager::PauseSound(const std::string soundName) const
 {
-    mAudioEngine->PauseSound(id);
+    mAudioEngine->PauseSound(soundName);
 }

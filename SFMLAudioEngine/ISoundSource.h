@@ -9,5 +9,6 @@ public:
     virtual void Pause() = 0;
 
 protected:
-    ISoundSource(){}
+    ISoundSource()
+    { }
 };

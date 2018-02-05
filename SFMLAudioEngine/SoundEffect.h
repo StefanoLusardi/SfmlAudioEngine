@@ -11,8 +11,7 @@ class SoundEffect : public ISoundSource
 
 public:
     ~SoundEffect() override
-    {
-    }
+    { }
 
     void Play() override
     {
@@ -29,15 +28,18 @@ public:
         mSound.pause();
     }
 
-//protected:
-    SoundEffect() { }
+private:
+    SoundEffect(const std::string soundPath)
+    {
+        mBuffer.loadFromFile(soundPath + ".wav");
+        mSound.setBuffer(mBuffer);
+    }
+
     SoundEffect(const sf::Sound& sound, const sf::SoundBuffer& buffer)
     : mSound{sound}
     , mBuffer{buffer}
-    {
-    }
+    { }
 
-private:
-    sf::Sound      mSound;
+    sf::Sound       mSound;
     sf::SoundBuffer mBuffer;
 };

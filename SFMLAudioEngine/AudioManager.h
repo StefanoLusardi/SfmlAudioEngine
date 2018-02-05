@@ -1,25 +1,34 @@
 #pragma once
+
 #include "Utils.h"
-#include <string>
-#include <memory>
 #include "AudioEngine.h"
-#include <functional>
 #include "SoundDescription.h"
+   
+#include <memory>
+#include <string>
+#include <vector>
+#include <functional>
+
+class PolyphonyManager;
 
 class AudioManager
 {
 public:
     AudioManager();
+    AudioManager(const PolyphonyManager& polyphonyManager);
     ~AudioManager();
-    //SoundId RegisterSound(const SoundDescription& description) const;
-    //void UnregisterSound(const SoundId id) const;
 
-    void LoadSound(const SoundId id) const;
-    void UnloadSound(const SoundId id) const;
+    void RegisterSounds(const std::vector<SoundDescription>& descriptions) const;
+    void RegisterSound(const SoundDescription& description) const;
+    void UnregisterSound(const std::string soundName) const;
+    void UnregisterSounds() const;
 
-    void PlaySound(const SoundId id, const Vector3d& position, const double volume) const;
-    void StopSound(const SoundId id, const double fadeoutMilliseconds) const;
-    void PauseSound(const SoundId id) const;
+    void LoadSound(const std::string soundName) const;
+    void UnloadSound(const std::string soundName) const;
+
+    void PlaySound(const std::string soundName, const Vector3d& position, const double volume) const;
+    void StopSound(const std::string soundName, const double fadeoutMilliseconds) const;
+    void PauseSound(const std::string soundName) const;
 
     void Update(const double updateTime) const;
 

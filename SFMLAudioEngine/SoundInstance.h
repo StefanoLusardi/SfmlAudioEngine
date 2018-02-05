@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <map>
 
 #include "Utils.h"
 #include "AudioFader.h"
@@ -17,7 +18,7 @@ class SoundInstance
 public:
     enum class SoundState {TOPLAY, PLAYING, STOPPING, STOPPED};
 
-    SoundInstance(const AudioEngine& engine, const SoundId id, const SoundDescription description, const Vector3d& position, const double volume);
+    SoundInstance(const AudioEngine* engine, const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator sound, const Vector3d& position, const double volume);
     ~SoundInstance();
 
     void Play();
@@ -28,18 +29,17 @@ public:
     void SetStopRequest(const bool stopRequest);
     void StartFadeout(const double fadeoutMilliseconds, const double targetVolume);
 
-    SoundState GetState() const;
+    const SoundState GetState() const;
+    const std::string GetName() const;
 
 private:
-    //std::unique_ptr<SoundObject> mSoundObject;
-    std::unique_ptr<ISoundSource> mSoundSource;
-    std::unique_ptr<AudioFader> mFader;
     SoundDescription mSoundDescription;
-    SoundId mSoundId;
+    const std::shared_ptr<ISoundSource> mSoundSource;
+    std::unique_ptr<AudioFader> mFader;
     SoundState mState;
     Vector3d mPosition;
     double mVolume;
     bool mStopRequest;
-    
+    //SoundId mSoundId; // need this? if so pass it in the ctor
 };
 

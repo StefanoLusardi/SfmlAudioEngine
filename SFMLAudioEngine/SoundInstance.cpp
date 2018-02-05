@@ -2,16 +2,19 @@
 #include "SoundFactory.h"
 
 // Initialize SoundFactory static map of SoundSource constructors
-std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>()>> SoundFactory::mCreator = {};
+std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(std::string)>> SoundFactory::mCreator = {};
 
-SoundInstance::SoundInstance(const AudioEngine& engine, const SoundId id, const SoundDescription description, const Vector3d& position, const double volume)
-: mSoundId{id}
+SoundInstance::SoundInstance(const AudioEngine* engine
+    , const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator sound
+    , const Vector3d& position
+    , const double volume)
+: mSoundDescription{sound->first}
+, mSoundSource{sound->second}
 , mState{SoundState::STOPPED}
 , mVolume{volume}
 , mStopRequest{false}
 {
-    //mSoundObject = std::make_unique<SoundObject>(description);
-    mSoundSource = SoundFactory::Create(mSoundDescription.mSoundType);
+    //mSoundId     = 0; // Set here?
     mFader       = std::make_unique<AudioFader>(1, 1, 1);
 }
 
@@ -34,9 +37,14 @@ void SoundInstance::StartFadeout(const double fadeoutMilliseconds, const double 
     mFader->Reset(mVolume, targetVolume, fadeoutMilliseconds);
 }
 
-SoundInstance::SoundState SoundInstance::GetState() const
+const SoundInstance::SoundState SoundInstance::GetState() const
 {
     return mState;
+}
+
+const std::string SoundInstance::GetName() const
+{
+    return mSoundDescription.mSoundName;
 }
 
 void SoundInstance::Play()
@@ -51,6 +59,7 @@ void SoundInstance::Stop()
 
 void SoundInstance::Update(const double updateTime)
 {
+    // Update instance Finite State Machine logic
     switch(mState)
     {
         case SoundState::TOPLAY:

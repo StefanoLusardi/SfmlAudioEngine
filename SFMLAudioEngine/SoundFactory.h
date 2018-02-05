@@ -7,27 +7,34 @@
 #include "SoundEffect.h"
 #include "SoundStream.h"
 #include "Oscillator.h"
-#include "SoundDescription.h"
 
 class SoundFactory
 {
 public:
-    static std::unique_ptr<ISoundSource> Create(const SoundDescription::SoundType soundType)
+    static std::unique_ptr<ISoundSource> Create(const SoundDescription::SoundType soundType, const std::string soundPath)
     {
         const auto ctor = mCreator.find(soundType);
         if (ctor != mCreator.end())
-            return ctor->second();
+            return ctor->second(soundPath);
 
         return nullptr;
     }
 
-private:
-    SoundFactory()
+    static void Initialize()
     {
-        mCreator[SoundDescription::SoundType::STREAM] = []() {return std::make_unique<SoundStream>(); };
-        mCreator[SoundDescription::SoundType::SFX]    = []() {return std::make_unique<SoundEffect>(); };
-        mCreator[SoundDescription::SoundType::OSC]    = []() {return std::make_unique<Oscillator>(); };
+        // std::make_unique<>() won't work in this case. 
+        // See https://stackoverflow.com/questions/29896268/friend-function-is-unable-to-construct-a-unique-pointer-of-the-class
+        mCreator[SoundDescription::SoundType::STREAM] = [](const std::string soundPath) {return std::unique_ptr<SoundStream>(new SoundStream(soundPath)); };
+        mCreator[SoundDescription::SoundType::SFX]    = [](const std::string soundPath) {return std::unique_ptr<SoundEffect>(new SoundEffect(soundPath)); };
+        mCreator[SoundDescription::SoundType::OSC]    = [](const std::string soundPath) {return std::unique_ptr<Oscillator>(new Oscillator()); };
     }
 
-    static std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>()>> mCreator;
+    ~SoundFactory()
+    { }
+
+private:
+    SoundFactory()
+    { }
+
+    static std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(std::string)>> mCreator;
 };

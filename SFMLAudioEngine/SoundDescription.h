@@ -4,12 +4,38 @@
 struct SoundDescription
 {
     enum class SoundType {SFX, STREAM, OSC};
+    
+    SoundDescription(
+        const std::string soundName,
+        const SoundType   soundType,
+        const double      defaultVolume = 1.0,
+        const double      minDistance = 1.0,
+        const double      maxDistance = 500.0,
+        const bool        isLoop = false,
+        const bool        is3d = false)
+            : mSoundName(soundName)
+            , mSoundType(soundType)
+            , mDefaultVolume{ defaultVolume }
+            , mMinDistance{ minDistance }
+            , mMaxDistance{ maxDistance }
+            , mIsLoop{ isLoop }
+            , mIs3d{ is3d }
+    { }
 
-    SoundDescription() = default;
-    ~SoundDescription() = default;
+    ~SoundDescription() { }
 
-    std::string mSoundName;
-    SoundType mSoundType;
+    bool operator==(const SoundDescription& rhs) const
+    {
+        return this->mSoundName == rhs.mSoundName;
+    }
+
+    bool operator< (const SoundDescription& rhs) const
+    {
+        return this->mSoundName < rhs.mSoundName;
+    }
+
+    /*const*/ std::string mSoundName;
+    /*const*/ SoundType mSoundType;
     double mDefaultVolume;
     double mMinDistance;
     double mMaxDistance;

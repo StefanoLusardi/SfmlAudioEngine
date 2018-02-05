@@ -143,6 +143,7 @@
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="ISoundSource.h" />
     <ClInclude Include="Oscillator.h" />
+    <ClInclude Include="PolyphonyManager.h" />
     <ClInclude Include="SoundDescription.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="SoundFactory.h" />

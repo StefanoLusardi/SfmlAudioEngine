@@ -7,7 +7,7 @@ class SoundFactory;
 
 class Oscillator : public ISoundSource
 {
-    friend SoundFactory;
+    friend class SoundFactory;
 
 public:
     ~Oscillator() override
@@ -30,9 +30,9 @@ public:
         mOscillator->pause();
     }
 
-//protected:
-    Oscillator() { }
-
 private:
+    Oscillator() :mOscillator{nullptr}
+    { }
+    
     sf::SoundStream *mOscillator;
 };
