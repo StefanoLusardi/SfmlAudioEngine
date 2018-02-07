@@ -16,23 +16,25 @@ class AudioEngine;
 class SoundInstance
 {
 public:
-    enum class SoundState {TOPLAY, PLAYING, STOPPING, STOPPED};
+    enum class SoundState {INITIALIZE, TOPLAY, PLAYING, STOPPING, STOPPED, LOADING };
 
-    SoundInstance(const AudioEngine* engine, const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator sound, const Vector3d& position, const double volume);
+    SoundInstance(AudioEngine& engine, /*const SoundId id,*/ const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator sound, const Vector3d& position, const double volume);
     ~SoundInstance();
 
-    void Play();
-    void Stop();
+    void Play() const;
+    void Stop() const;
     void Update(const double updateTime);
 
     bool GetStopRequest() const;
     void SetStopRequest(const bool stopRequest);
-    void StartFadeout(const double fadeoutMilliseconds, const double targetVolume);
+    void StartFade(const double fadeoutMilliseconds, const double targetVolume) const;
 
     const SoundState GetState() const;
     const std::string GetName() const;
 
 private:
+    AudioEngine & mEngine;
+    //SoundId mSoundId;
     SoundDescription mSoundDescription;
     const std::shared_ptr<ISoundSource> mSoundSource;
     std::unique_ptr<AudioFader> mFader;
@@ -40,6 +42,5 @@ private:
     Vector3d mPosition;
     double mVolume;
     bool mStopRequest;
-    //SoundId mSoundId; // need this? if so pass it in the ctor
 };
 

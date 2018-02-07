@@ -31,7 +31,7 @@ public:
 private:
     SoundEffect(const std::string soundPath)
     {
-        mBuffer.loadFromFile(soundPath + ".wav");
+        mBuffer.loadFromFile("../AudioSamples/" + soundPath + ".wav");
         mSound.setBuffer(mBuffer);
     }
 

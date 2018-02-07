@@ -22,10 +22,10 @@ public:
 
     static void Initialize()
     {
-        // std::make_unique<>() won't work in this case. 
+        // std::make_unique<>() function won't work here beacause it's not a member function of this class and so it can't be frien of the 3 created classes
         // See https://stackoverflow.com/questions/29896268/friend-function-is-unable-to-construct-a-unique-pointer-of-the-class
-        mCreator[SoundDescription::SoundType::STREAM] = [](const std::string soundPath) {return std::unique_ptr<SoundStream>(new SoundStream(soundPath)); };
         mCreator[SoundDescription::SoundType::SFX]    = [](const std::string soundPath) {return std::unique_ptr<SoundEffect>(new SoundEffect(soundPath)); };
+        mCreator[SoundDescription::SoundType::STREAM] = [](const std::string soundPath) {return std::unique_ptr<SoundStream>(new SoundStream(soundPath)); };
         mCreator[SoundDescription::SoundType::OSC]    = [](const std::string soundPath) {return std::unique_ptr<Oscillator>(new Oscillator()); };
     }
 

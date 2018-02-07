@@ -32,6 +32,7 @@ public:
     void Update(const double updateTime);
 
     bool IsLoaded(const std::string soundName);
+    bool IsInstanciated(const std::string soundName);
     const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator FindSound(const std::string soundName);
     const std::map<const SoundId, std::unique_ptr<SoundInstance>>::iterator FindInstance(const std::string soundName);
     

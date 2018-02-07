@@ -74,10 +74,10 @@ int main(int argc, char* argv[])
             {
                 const auto mousePosition = sf::Mouse::getPosition(window);
 
-                // Sound exists and it's loaded
+                // Sound is registered and it's loaded
                 if (colliderStrip[0]->contains(mousePosition))  audio.PlaySound("crash", {}, 1);
 
-                // Sound exists but it's not loaded
+                // Sound is registered but it's not loaded
                 if (colliderStrip[1]->contains(mousePosition))  audio.PlaySound("hihat", {}, 1);
 
                 // 

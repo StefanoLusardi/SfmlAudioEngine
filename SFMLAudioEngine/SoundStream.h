@@ -11,7 +11,7 @@ class SoundStream : public ISoundSource
 public:
     ~SoundStream() override
     {
-        delete mMusic;
+        //delete mMusic;
     }
 
     void Play() override
@@ -32,13 +32,16 @@ public:
 private:
     SoundStream(const std::string soundPath)
     {
-        mMusic = new sf::Music();
-        mMusic->openFromFile(soundPath + ".wav");
+        mMusic = std::make_unique<sf::Music>();
+        mMusic->openFromFile("../AudioSamples/" + soundPath + ".wav");
+        mMusic->setPlayingOffset(sf::seconds(0));
     }
 
     SoundStream(sf::Music *sound)
     : mMusic{ sound }
-    { }
+    {
+        auto x = 0;
+    }
 
-    sf::Music *mMusic;
+    std::unique_ptr<sf::Music> mMusic;
 };

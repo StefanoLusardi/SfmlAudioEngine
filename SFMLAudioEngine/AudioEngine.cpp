@@ -20,10 +20,14 @@ AudioEngine::~AudioEngine()
 {
 }
 
-
 bool AudioEngine::IsLoaded(const std::string soundName)
 {
     return FindSound(soundName) != mSounds.end();
+}
+
+bool AudioEngine::IsInstanciated(const std::string soundName)
+{
+    return FindInstance(soundName) != mInstances.end();
 }
 
 /**
@@ -143,7 +147,7 @@ SoundId AudioEngine::PlaySound(const std::string soundName, const Vector3d& posi
     if (sound == mSounds.end())
         return -1;
 
-    mInstances[instanceId] = std::make_unique<SoundInstance>(this, sound, position, volume);
+    mInstances[instanceId] = std::make_unique<SoundInstance>(*this, sound, position, volume);
     return instanceId;
 }
 
@@ -160,7 +164,7 @@ void AudioEngine::StopSound(const std::string soundName, const double fadeoutMil
     else
     {
         sound->second->SetStopRequest(true);
-        sound->second->StartFadeout(fadeoutMilliseconds, 0.0f);
+        sound->second->StartFade(fadeoutMilliseconds, 0.0f);
     }
 }
 
