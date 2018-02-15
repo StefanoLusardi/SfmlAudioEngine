@@ -10,9 +10,7 @@ class SoundStream : public ISoundSource
 
 public:
     ~SoundStream() override
-    {
-        //delete mMusic;
-    }
+    { }
 
     void Play() override
     {
@@ -28,20 +26,27 @@ public:
     {
         mMusic->pause();
     }
+    
+    void SetLoop(const bool isLoop) override
+    {
+        mMusic->setLoop(isLoop);
+    }
 
 private:
-    SoundStream(const std::string soundPath)
+    SoundStream(const SoundDescription soundDescription)
     {
         mMusic = std::make_unique<sf::Music>();
-        mMusic->openFromFile("../AudioSamples/" + soundPath + ".wav");
-        mMusic->setPlayingOffset(sf::seconds(0));
+        mMusic->openFromFile("../AudioSamples/" + soundDescription.mSoundName + ".wav");
+        //mMusic->setPlayingOffset(sf::seconds(0));
+        SoundStream::SetLoop(soundDescription.mIsLoop);
     }
 
     SoundStream(sf::Music *sound)
     : mMusic{ sound }
     {
-        auto x = 0;
+
     }
 
+private:
     std::unique_ptr<sf::Music> mMusic;
 };

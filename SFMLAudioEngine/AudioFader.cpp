@@ -21,15 +21,15 @@ void AudioFader::Update(const double elapsedTime)
 {
     // Linear interpolator: y = ((y1-y0)/(x1-x0))*(x-x0)+y0 (here x0 is always 0)
     // The formula holds both constant and non-constant time increment (no fixed time step)
-    mCurrentValue = (mDeltaVolume / mDeltaTime) * elapsedTime + mInitialVolume;
+    mCurrentVolume = (mDeltaVolume / mDeltaTime) * elapsedTime + mInitialVolume;
 }
 
 double AudioFader::GetValue() const
 {
-    return mCurrentValue;
+    return mCurrentVolume;
 }
 
 bool AudioFader::IsFinished() const
 {
-    return mCurrentValue == mTargetVolume;
+    return mCurrentVolume == mTargetVolume;
 }

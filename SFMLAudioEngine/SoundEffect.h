@@ -27,19 +27,26 @@ public:
     {
         mSound.pause();
     }
+    
+    void SetLoop(const bool isLoop) override
+    {
+        mSound.setLoop(isLoop);
+    }
 
 private:
-    SoundEffect(const std::string soundPath)
+    SoundEffect(const SoundDescription soundDescription)
     {
-        mBuffer.loadFromFile("../AudioSamples/" + soundPath + ".wav");
+        mBuffer.loadFromFile("../AudioSamples/" + soundDescription.mSoundName + ".wav");
         mSound.setBuffer(mBuffer);
+        SoundEffect::SetLoop(soundDescription.mIsLoop);
     }
 
     SoundEffect(const sf::Sound& sound, const sf::SoundBuffer& buffer)
     : mSound{sound}
     , mBuffer{buffer}
     { }
-
+    
+private:
     sf::Sound       mSound;
     sf::SoundBuffer mBuffer;
 };

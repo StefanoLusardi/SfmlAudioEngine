@@ -12,10 +12,6 @@ public:
     explicit AudioEngine(const PolyphonyManager& polyphonyManager);
     ~AudioEngine();
 
-    // Check this C++17 fold function
-    //template <typename T, typename ... Ts>
-    //bool AudioEngine::RegisterSounds(const T soundsMap, Ts ... descriptions);
-
     void RegisterSounds(const std::vector<SoundDescription>& descriptions);
     void RegisterSound(const SoundDescription& description);
     void UnregisterSound(const std::string& soundName);
@@ -28,6 +24,7 @@ public:
     SoundId PlaySound(const std::string soundName, const Vector3d& position, const double volume);
     void StopSound(const std::string soundName, const double fadeoutMilliseconds);
     void PauseSound(const std::string soundName);
+    void StopAllSounds();
 
     void Update(const double updateTime);
 
@@ -35,10 +32,6 @@ public:
     bool IsInstanciated(const std::string soundName);
     const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator FindSound(const std::string soundName);
     const std::map<const SoundId, std::unique_ptr<SoundInstance>>::iterator FindInstance(const std::string soundName);
-    
-    // void StopAllSounds();
-    // bool IsPlaying(const SoundId id);
-    // bool IsLoaded(const SoundId id);
 
 private:
     int mMaxInstances;

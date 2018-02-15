@@ -52,12 +52,6 @@ AudioEngine::FindInstance(const std::string soundName)
     {return soundName == sound.second->GetName(); });
 }
 
-//template <typename T, typename ... Ts>
-//bool AudioEngine::RegisterSounds(const T soundsMap, Ts ... descriptions)
-//{
-//    return (soundsMap.insert(descriptions).second && ...);
-//}
-
 void AudioEngine::RegisterSounds(const std::vector<SoundDescription>& descriptions)
 {
     for (const auto& description : descriptions)
@@ -103,7 +97,8 @@ void AudioEngine::LoadSound(const std::string soundName)
         return;
 
     const auto soundDescription = sound->first;
-    mSounds[soundDescription] = SoundFactory::Create(soundDescription.mSoundType, soundDescription.mSoundName);
+    mSounds[soundDescription] = SoundFactory::Create(soundDescription);
+    //mSounds[soundDescription] = SoundFactory::Create(soundDescription.mSoundType, soundDescription.mSoundName);
 }
 
 void AudioEngine::UnloadSound(const std::string soundName)
@@ -137,7 +132,7 @@ void AudioEngine::Update(const double updateTime)
 SoundId AudioEngine::PlaySound(const std::string soundName, const Vector3d& position, const double volume)
 {
     // At the moment there is no control over the active instance counter.
-    // In order to limit the polyphony (or just to clamp at a maximum number of active voices) 
+    // In order to limit the polyphony (or just to clamp at a maximum number of active voices),
     // check if the value of mNextInstanceId is below a fixed threshold, maybe set during the initialization of the AudioEngine. 
     // Then we need to keep track of the next available slots after an instance is removed from the mInstances map.
     // So in the future we need a function that makes mNextInstanceId point to the next free slot in the mInstances map.
@@ -153,21 +148,27 @@ SoundId AudioEngine::PlaySound(const std::string soundName, const Vector3d& posi
 
 void AudioEngine::StopSound(const std::string soundName, const double fadeoutMilliseconds)
 {
-    // We need to provide an override of this function in wich the first argument is the SoundId of the stopped instance
-    // This implies that the user keeps track of the
     const auto sound = FindInstance(soundName);
     if (sound == mInstances.end())
         return;
 
-    if (fadeoutMilliseconds <= 0.0f)
-        sound->second->Stop();
-    else
-    {
-        sound->second->SetStopRequest(true);
+    if (fadeoutMilliseconds > 0.0f)
         sound->second->StartFade(fadeoutMilliseconds, 0.0f);
-    }
+
+    sound->second->SetStopRequest(true);
 }
 
 void AudioEngine::PauseSound(const std::string soundName)
 {
+    const auto sound = FindInstance(soundName);
+    if (sound == mInstances.end())
+        return;
+
+    sound->second->Pause();
+}
+
+void AudioEngine::StopAllSounds()
+{
+    for (const auto& sound : mInstances)
+        sound.second->SetStopRequest(true);
 }

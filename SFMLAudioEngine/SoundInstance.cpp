@@ -3,15 +3,13 @@
 #include "AudioEngine.h"
 
 // Initialize SoundFactory static map of SoundSource constructors
-std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(std::string)>> SoundFactory::mCreator = {};
+std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(const SoundDescription)>> SoundFactory::mCreator = {};
 
 SoundInstance::SoundInstance(AudioEngine& engine
-    //, const SoundId id
     , const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator sound
     , const Vector3d& position
     , const double volume)
       : mEngine{engine}
-      //, mSoundId{id}
       , mSoundDescription{sound->first}
       , mSoundSource{sound->second}
       , mState{SoundState::INITIALIZE}
@@ -61,6 +59,11 @@ void SoundInstance::Stop() const
     mSoundSource->Stop();
 }
 
+void SoundInstance::Pause() const
+{
+    mSoundSource->Pause();
+}
+
 void SoundInstance::Update(const double updateTime)
 {
     // Update instance Finite State Machine logic
@@ -91,12 +94,10 @@ void SoundInstance::Update(const double updateTime)
                     // Or using an override Play(const double fadeInTime)
                     Play();
                     mState = SoundState::PLAYING;
-                    
+                    return;
                 }
-                else
-                {
-                    mState = SoundState::STOPPING;
-                }
+                
+                mState = SoundState::STOPPING;
             }
 
             break;
@@ -115,9 +116,15 @@ void SoundInstance::Update(const double updateTime)
         case SoundState::PLAYING:
         {
             // UpdateInstanceParameters();
-            if (mStopRequest || mState != SoundState::PLAYING)
+            if (mStopRequest || mState != SoundState::PLAYING )
             {
                 mState = SoundState::STOPPING;
+                return;
+            }
+
+            if (!mSoundSource->IsSourcePlaying() && !mSoundDescription.mIsLoop)
+            {
+                mState = SoundState::STOPPED;
                 return;
             }
 
@@ -127,14 +134,18 @@ void SoundInstance::Update(const double updateTime)
         case SoundState::STOPPING:
         {
             mFader->Update(updateTime);
+
+            // Here we sholud pass the current fade volume and multiply it with the source volume
             // UpdateInstanceParameters();
 
             if (mFader->IsFinished())
             {
                 Stop();
+                mState = SoundState::STOPPED;
+                return;
             }
 
-            if (mState != SoundState::PLAYING)
+            if (mState != SoundState::PLAYING || !mSoundSource->IsSourcePlaying())
             {
                 mState = SoundState::STOPPED;
                 return;

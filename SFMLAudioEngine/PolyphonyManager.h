@@ -5,7 +5,8 @@ class PolyphonyManager
 public:
     enum class VirtualVoiceSettings {OLDEST, VOLUME, DISTANCE};
 
-    explicit PolyphonyManager(const int maxInstance, const int maxLoadedSound
+    explicit PolyphonyManager(const int maxInstance
+        , const int maxLoadedSound
         , const VirtualVoiceSettings vistualVoiceSettings = VirtualVoiceSettings::OLDEST)
     : mMaxInstances{ maxInstance }
     , mMaxLoadedSounds{ maxLoadedSound }

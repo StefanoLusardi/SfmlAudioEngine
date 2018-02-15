@@ -15,6 +15,6 @@ private:
     double mTargetVolume;
     double mDeltaVolume;
     double mDeltaTime;
-    double mCurrentValue;
+    double mCurrentVolume;
 };
 
