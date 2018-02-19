@@ -1,6 +1,7 @@
 #include "SoundInstance.h"
 #include "SoundFactory.h"
 #include "AudioEngine.h"
+#include <cassert>
 
 // Initialize SoundFactory static map of SoundSource constructors
 std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(const SoundDescription)>> SoundFactory::mCreator = {};
@@ -47,6 +48,46 @@ const SoundInstance::SoundState SoundInstance::GetState() const
 const std::string SoundInstance::GetName() const
 {
     return mSoundDescription.mSoundName;
+}
+
+void SoundInstance::SetVolume(const double volume, const bool isIncremental) const
+{
+    // If isIncremental == true, then volume is an absolute value, 
+    // otherwise it's a delta to be applied to the current volume.
+
+    if (!isIncremental)
+    {
+        assert(volume >= 0.0 && volume <= 100.0);
+        mSoundSource->SetVolume(volume);
+        return;
+    }
+
+    // Sum and clip volume in range [0 ; +100]
+    auto newVolume = mSoundSource->GetVolume();
+    newVolume += volume;
+
+    if (newVolume > 100.0) newVolume = 100.0;
+    if (newVolume <   0.0) newVolume = 0.0;
+
+    mSoundSource->SetVolume(newVolume);
+}
+
+void SoundInstance::SetPitch(const double pitch, const bool isIncremental) const
+{
+    if (!isIncremental)
+    {
+        assert(pitch >= 0.0);
+        mSoundSource->SetPitch(pitch);
+        return;
+    }
+
+    // Sum and clip pitch in range [0.001 ; +inf]
+    auto newPitch = mSoundSource->GetPitch();
+    newPitch += pitch;
+
+    if (newPitch <= 0.001) newPitch = 0.001;
+
+    mSoundSource->SetPitch(newPitch);
 }
 
 void SoundInstance::Play() const

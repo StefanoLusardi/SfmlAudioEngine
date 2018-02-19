@@ -12,25 +12,16 @@ public:
     ~SoundStream() override
     { }
 
-    void Play() override
-    {
-        mMusic->play();
-    }
+    void Play() override  { mMusic->play(); }
+    void Stop() override  { mMusic->stop(); }
+    void Pause() override { mMusic->pause(); }
 
-    void Stop() override
-    {
-        mMusic->stop();
-    }
+    void SetLoop(const bool isLoop) override     { mMusic->setLoop(isLoop); }
+    void SetPitch(const double pitch) override   { mMusic->setPitch(pitch); }
+    void SetVolume(const double volume) override { mMusic->setVolume(volume); }
 
-    void Pause() override
-    {
-        mMusic->pause();
-    }
-    
-    void SetLoop(const bool isLoop) override
-    {
-        mMusic->setLoop(isLoop);
-    }
+    double GetPitch() override  { return mMusic->getPitch(); }
+    double GetVolume() override { return mMusic->getVolume(); }
 
 private:
     SoundStream(const SoundDescription soundDescription)
@@ -39,14 +30,12 @@ private:
         mMusic->openFromFile("../AudioSamples/" + soundDescription.mSoundName + ".wav");
         //mMusic->setPlayingOffset(sf::seconds(0));
         SoundStream::SetLoop(soundDescription.mIsLoop);
+        SoundStream::SetVolume(soundDescription.mDefaultVolume);
     }
 
     SoundStream(sf::Music *sound)
     : mMusic{ sound }
-    {
+    { }
 
-    }
-
-private:
     std::unique_ptr<sf::Music> mMusic;
 };

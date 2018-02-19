@@ -33,6 +33,9 @@ public:
     const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator FindSound(const std::string soundName);
     const std::map<const SoundId, std::unique_ptr<SoundInstance>>::iterator FindInstance(const std::string soundName);
 
+    void SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental);
+    void SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental);
+
 private:
     int mMaxInstances;
     SoundId mNextInstanceId;

@@ -32,6 +32,9 @@ public:
 
     void Update(const double updateTime) const;
 
+    void SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental) const;
+    void SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental) const;
+
     //void StopAllSounds();
     //void SetSoundPosition(const SoundId id);
     //void SetSoundVolume(const SoundId id);

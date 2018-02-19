@@ -39,6 +39,16 @@ void AudioManager::Update(const double updateTime) const
     mAudioEngine->Update(updateTime);
 }
 
+void AudioManager::SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental) const
+{
+    mAudioEngine->SetSoundVolume(soundName, volume, isIncremental);
+}
+
+void AudioManager::SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental) const
+{
+    mAudioEngine->SetSoundPitch(soundName, pitch, isIncremental);
+}
+
 void AudioManager::LoadSound(const std::string soundName) const
 {
     mAudioEngine->LoadSound(soundName);    

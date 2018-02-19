@@ -172,3 +172,22 @@ void AudioEngine::StopAllSounds()
     for (const auto& sound : mInstances)
         sound.second->SetStopRequest(true);
 }
+
+
+void AudioEngine::SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental)
+{
+    const auto sound = FindInstance(soundName);
+    if (sound == mInstances.end())
+        return;
+
+    sound->second->SetVolume(volume, isIncremental);
+}
+
+void AudioEngine::SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental)
+{
+    const auto sound = FindInstance(soundName);
+    if (sound == mInstances.end())
+        return;
+
+    sound->second->SetPitch(pitch, isIncremental);
+}

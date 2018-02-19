@@ -32,6 +32,8 @@ public:
 
     const SoundState GetState() const;
     const std::string GetName() const;
+    void SetVolume(const double volume, const bool isIncremental) const;
+    void SetPitch(const double pitch, const bool isIncremental) const;
 
 private:
     AudioEngine & mEngine;

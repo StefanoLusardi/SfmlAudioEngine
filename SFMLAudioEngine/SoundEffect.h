@@ -13,25 +13,16 @@ public:
     ~SoundEffect() override
     { }
 
-    void Play() override
-    {
-        mSound.play();
-    }
+    void Play() override  { mSound.play(); }
+    void Stop() override  { mSound.stop(); }
+    void Pause() override { mSound.pause(); }
 
-    void Stop() override
-    {
-        mSound.stop();
-    }
+    void SetLoop(const bool isLoop) override     { mSound.setLoop(isLoop); }
+    void SetPitch(const double pitch) override   { mSound.setPitch(pitch); }
+    void SetVolume(const double volume) override { mSound.setVolume(volume); }
 
-    void Pause() override
-    {
-        mSound.pause();
-    }
-    
-    void SetLoop(const bool isLoop) override
-    {
-        mSound.setLoop(isLoop);
-    }
+    double GetPitch() override { return mSound.getPitch(); }
+    double GetVolume() override { return mSound.getVolume(); }
 
 private:
     SoundEffect(const SoundDescription soundDescription)
@@ -45,7 +36,7 @@ private:
     : mSound{sound}
     , mBuffer{buffer}
     { }
-    
+
 private:
     sf::Sound       mSound;
     sf::SoundBuffer mBuffer;

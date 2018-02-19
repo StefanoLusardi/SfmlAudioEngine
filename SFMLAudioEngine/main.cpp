@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
     for (const auto& soundDescription : Mock::GetSoundsDescriptions())
         audio.LoadSound(soundDescription.mSoundName);
 
-    sf::RenderWindow window(sf::VideoMode(845, 215), "SFML Audio Engine");
+    sf::RenderWindow window(sf::VideoMode(845, 635), "SFML Audio Engine");
     UserInterface userInterface{window, audio, Mock::GetSoundsDescriptions() };
 
     auto start = std::chrono::system_clock::now();

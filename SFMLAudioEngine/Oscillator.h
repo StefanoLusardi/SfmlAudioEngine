@@ -7,33 +7,58 @@
 
 class SoundFactory;
 
+class Interpolator
+{
+public:
+    Interpolator()
+    {
+        updateStep();
+        current = initial + step;
+    }
+
+    double initial;
+    double current;
+    double target;
+    double deltaTime;
+    double step;
+
+    void updateStep() { step = (target - initial) / deltaTime; }
+    double getValue() { current += step; return current; }
+};
+
 class StreamOscillator : public sf::SoundStream
 {
 public:
-    StreamOscillator(const int numChannels = 1, const int sampleRate = 48000)
-    {
-        m_samples = std::vector<sf::Int16>(8*2048, 0);
-
-        // reset the current playing position 
-        m_currentSample = 0;
-
-        // Init internal oscillator parameters
-        Init();
-
-        // initialize the base class
-        initialize(numChannels, sampleRate);
+    StreamOscillator()
+        : mMaxAmp{ std::numeric_limits<sf::Int16>::max() }
+        , mSampleRate{ 48000 }
+        , mBufferSize{ 2048 }
+        , mFrequency{ 440 }
+        , mAmplitude{ 1 }
+        , mPhase{ 0 }
+        , mPhaseIncrement{ TWO_PI * mFrequency / mSampleRate }
+        , mBuffer{ std::vector<sf::Int16>(mBufferSize, 0) }
+    {    
+        const int numChannels = 1;
+        initialize(numChannels, mSampleRate);
     }
-    
+
+
 private:
+    const int mMaxAmp;
+    const int mSampleRate;
+    const int mBufferSize;
+
+    double mFrequency;
+    double mAmplitude;
 
     double mPhase;
     double mPhaseIncrement;
+    std::vector<sf::Int16> mBuffer;
 
-    void Init()
-    {
-        mPhase = 0; // phaseOffset;
-        mPhaseIncrement = (TWO_PI * 440 / 48000);
-    }
+    //Interpolator mAmplitude;
+    //Interpolator mFrequency;
+
 
     // Increment and keep phase wraped in the [0..2pi] range.
     // Must be called after each new generated sample.
@@ -44,7 +69,6 @@ private:
             mPhase -= TWO_PI;
     }
 
-
     void onSeek(sf::Time timeOffset) override
     {
         return;
@@ -52,44 +76,28 @@ private:
 
     bool onGetData(Chunk& data) override
     {
-        // number of samples to stream every time the function is called;
-        // in a more robust implementation, it should be a fixed
-        // amount of time rather than an arbitrary number of samples
-        //const int samplesToStream = 2048;
+        // The number of samples to stream every time the function is called 
+        // is equal to the buffer size of the samples vector.
 
-        // Sine Wave
-        for (int i = 0; i < m_samples.size(); ++i)
+        for (int i = 0; i < mBuffer.size(); ++i)
         {
-            m_samples[i] = 0.5 * std::sin(mPhase) * 32768;
+            mBuffer[i] = mAmplitude * std::sin(mPhase) * mMaxAmp; // pre-multiply mAmplitude*mMaxAmp
             UpdatePhase();
         }
 
-        // set the pointer to the next audio samples to be played
-        data.samples = &m_samples[m_currentSample];
-        data.sampleCount = m_samples.size();
+        /*for (int i = 0; i < mBuffer.size(); ++i)
+        {
+            mBuffer[i] = mAmplitude.getValue() * std::sin(mPhase) * 32767;
+            mPhaseIncrement = (TWO_PI * mFrequency.getValue() / mSampleRate);
+            UpdatePhase();
+        }*/
+
+        // Set the pointer to the next audio samples to be played
+        data.samples = &mBuffer.front();
+        data.sampleCount = mBuffer.size();
 
         return true;
-
-        // have we reached the end of the sound?
-        //if (m_currentSample + samplesToStream <= m_samples.size())
-        //{
-        //    // end not reached: stream the samples and continue
-        //    data.sampleCount = samplesToStream;
-        //    m_currentSample += samplesToStream;
-        //    return true;
-        //}
-        //else
-        //{
-        //    // end of stream reached: stream the remaining samples and stop playback
-        //    data.sampleCount = m_samples.size() - m_currentSample;
-        //    m_currentSample = m_samples.size();
-        //    return false;
-        //}
     }
-
-    //std::vector<sf::Int16> m_samples;
-    std::vector<sf::Int16> m_samples;
-    std::size_t m_currentSample;
 };
 
 class Oscillator : public ISoundSource
@@ -100,31 +108,23 @@ public:
     ~Oscillator() override
     { }
 
-    void Play() override
-    {
-        mOscillator->play();
-    }
+    void Play() override  { mOscillator->play(); }
+    void Stop() override  { mOscillator->stop(); }
+    void Pause() override { mOscillator->pause(); }
 
-    void Stop() override
-    {
-        mOscillator->stop();
-    }
+    void SetLoop(const bool /*isLoop*/) override { /* Oscillators are always looping by definition */ }
+    void SetPitch(const double pitch) override   { mOscillator->setPitch(pitch); }
+    void SetVolume(const double volume) override { mOscillator->setVolume(volume); }
 
-    void Pause() override
-    {
-        mOscillator->pause();
-    }
-    
-    void SetLoop(const bool isLoop) override
-    {
-        // Oscillators are always looping by definition
-        return;
-    }
+    double GetPitch() override { return mOscillator->getPitch(); }
+    double GetVolume() override { return mOscillator->getVolume(); }
 
 private:
-    Oscillator(const SoundDescription soundDescription) : mOscillator{std::make_unique<StreamOscillator>()}
+    Oscillator(const SoundDescription soundDescription) 
+    : mOscillator { std::make_unique<StreamOscillator>() }
     {
         Oscillator::SetLoop(soundDescription.mIsLoop);
+        Oscillator::SetVolume(soundDescription.mDefaultVolume);
     }
 
     std::unique_ptr<StreamOscillator> mOscillator;
