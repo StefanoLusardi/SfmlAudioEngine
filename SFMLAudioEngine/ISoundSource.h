@@ -14,9 +14,13 @@ public:
 
     virtual double GetPitch()  = 0;
     virtual double GetVolume() = 0;
+	
+	virtual bool IsSourcePlaying() = 0;
 
-    virtual void SetPosition(const AudioUtils::Vector3d position) { setPosition(position.x, position.y, position.z); }
-    virtual bool IsSourcePlaying() { return getStatus(); }
+    virtual void SetPosition(const AudioUtils::Vector3d position)
+    {
+	    setPosition(position.x, position.y, position.z);
+    }
 
 protected:
     ISoundSource()

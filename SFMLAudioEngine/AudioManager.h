@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <ratio>
+#include <chrono>
 
 class PolyphonyManager;
 
@@ -30,7 +32,7 @@ public:
     void StopSound(const std::string soundName, const double fadeoutMilliseconds) const;
     void PauseSound(const std::string soundName) const;
 
-    void Update(const double updateTime) const;
+    void Update(const std::chrono::duration<double, std::milli> updateTime) const;
 
     void SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental) const;
     void SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental) const;

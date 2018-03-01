@@ -1,4 +1,6 @@
 #include "AudioManager.h"
+#include <chrono>
+#include <chrono>
 
 AudioManager::AudioManager() 
 : mAudioEngine(new AudioEngine, [](AudioEngine *audioEngine) {delete audioEngine; })
@@ -34,7 +36,7 @@ void AudioManager::UnregisterSounds() const
     mAudioEngine->UnregisterSounds();
 }
 
-void AudioManager::Update(const double updateTime) const
+void AudioManager::Update(const std::chrono::duration<double, std::milli> updateTime) const
 {
     mAudioEngine->Update(updateTime);
 }

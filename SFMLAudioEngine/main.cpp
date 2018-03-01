@@ -4,6 +4,8 @@
 #include "UserInterface.h"
 #include "Mock.h"
 
+using namespace std::literals::chrono_literals;
+
 int main(int argc, char* argv[])
 {
     // Setup Polyphony Manager and instanciate Audio Engine which handles the Audio Engine
@@ -22,7 +24,9 @@ int main(int argc, char* argv[])
 
     auto start = std::chrono::system_clock::now();
     auto end   = std::chrono::system_clock::now();
-    auto elapsedTimeMillisec = 0;
+
+	// Do not auto here!
+	std::chrono::duration<double, std::milli> elapsedTimeMillisec = 0ms;
 
     while (window.isOpen())
     {
@@ -43,7 +47,8 @@ int main(int argc, char* argv[])
 
         // Update Audio Engine
         end = std::chrono::system_clock::now();
-        elapsedTimeMillisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		//elapsedTimeMillisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		elapsedTimeMillisec = end - start;
         audio.Update(elapsedTimeMillisec);
     }
 

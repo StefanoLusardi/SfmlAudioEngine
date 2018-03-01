@@ -9,7 +9,7 @@ UserInterface::UserInterface(sf::RenderWindow& parent, AudioManager& audioManage
     mFont.loadFromFile("../Font/arial.ttf");
 
     // Setup buttons strip
-    const auto xDelta{ 5 };
+    const auto xDelta{ 5.0 };
     const auto rectSize{ 100.f };
     auto xPosition = xDelta;
 
@@ -102,7 +102,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
     {
         if (collider->contains(mousePosition))
         {
-            mAudioManager.StopSound(mSoundDescriptions[idx].mSoundName, 0.0);
+            mAudioManager.StopSound(mSoundDescriptions[idx].mSoundName, 1000.0); // FadeOut in milliseconds
             return;
         }
         ++idx;

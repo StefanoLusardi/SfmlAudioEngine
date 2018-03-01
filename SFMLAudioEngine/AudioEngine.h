@@ -4,6 +4,7 @@
 #include "SoundDescription.h"
 #include <vector>
 #include "PolyphonyManager.h"
+#include <chrono>
 
 class AudioEngine
 {
@@ -26,7 +27,7 @@ public:
     void PauseSound(const std::string soundName);
     void StopAllSounds();
 
-    void Update(const double updateTime);
+    void Update(const std::chrono::duration<double, std::milli> updateTime);
 
     bool IsLoaded(const std::string soundName);
     bool IsInstanciated(const std::string soundName);

@@ -7,6 +7,7 @@
 #include "AudioFader.h"
 #include "ISoundSource.h"
 #include "SoundDescription.h"
+#include <chrono>
 
 using SoundId = int;
 using namespace AudioUtils;
@@ -24,9 +25,11 @@ public:
     void Play() const;
     void Stop() const;
     void Pause() const;
-    void Update(const double updateTime);
+	void ResetSoundSource();
+    void Update(const std::chrono::duration<double, std::milli> updateTime);
 
     bool GetStopRequest() const;
+	void StartFade(const double fadeoutMilliseconds, const double targetVolume);
     void SetStopRequest(const bool stopRequest);
     void StartFade(const double fadeoutMilliseconds, const double targetVolume) const;
 

@@ -2,6 +2,7 @@
 #include "SoundFactory.h"
 #include <vector>
 #include <algorithm>
+#include <chrono>
 
 AudioEngine::AudioEngine()
 : mNextInstanceId{ 0 }
@@ -113,7 +114,7 @@ void AudioEngine::UnloadSound(const std::string soundName)
     mSounds.erase(sound);
 }
 
-void AudioEngine::Update(const double updateTime)
+void AudioEngine::Update(const std::chrono::duration<double, std::milli> updateTime)
 {
     // Update instances at each game tick, then retrieve the stopped ones.
     std::vector<std::map<SoundId, std::unique_ptr<SoundInstance>>::iterator> stoppedInstances;

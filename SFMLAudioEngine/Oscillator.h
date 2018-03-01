@@ -45,9 +45,9 @@ public:
 
 
 private:
-    const int mMaxAmp;
     const int mSampleRate;
     const int mBufferSize;
+    const sf::Int16 mMaxAmp;
 
     double mFrequency;
     double mAmplitude;
@@ -81,6 +81,7 @@ private:
 
         for (int i = 0; i < mBuffer.size(); ++i)
         {
+			//mBuffer[i] = static_cast<sf::Int16>(mAmplitude * std::sin(mPhase));
             mBuffer[i] = mAmplitude * std::sin(mPhase) * mMaxAmp; // pre-multiply mAmplitude*mMaxAmp
             UpdatePhase();
         }
@@ -118,6 +119,8 @@ public:
 
     double GetPitch() override { return mOscillator->getPitch(); }
     double GetVolume() override { return mOscillator->getVolume(); }
+
+	bool IsSourcePlaying() override { return mOscillator->getStatus(); }
 
 private:
     Oscillator(const SoundDescription soundDescription) 

@@ -18,7 +18,7 @@ SoundInstance::SoundInstance(AudioEngine& engine
       , mVolume{volume}
       , mStopRequest{false}
 {
-    mFader = std::make_unique<AudioFader>(1, 1, 1);
+	mFader = nullptr;
 }
 
 SoundInstance::~SoundInstance()
@@ -35,8 +35,9 @@ bool SoundInstance::GetStopRequest() const
     return mStopRequest;
 }
 
-void SoundInstance::StartFade(const double fadeoutMilliseconds, const double targetVolume = 0) const
+void SoundInstance::StartFade(const double fadeoutMilliseconds, const double targetVolume = 0) 
 {
+	mFader = std::make_unique<AudioFader>(1, 1, 1);
     mFader->Reset(mVolume, targetVolume, fadeoutMilliseconds);
 }
 
@@ -105,7 +106,12 @@ void SoundInstance::Pause() const
     mSoundSource->Pause();
 }
 
-void SoundInstance::Update(const double updateTime)
+void SoundInstance::ResetSoundSource()
+{
+	mSoundSource->setVolume(mSoundDescription.mDefaultVolume);
+}
+
+void SoundInstance::Update(const std::chrono::duration<double, std::milli> updateTime)
 {
     // Update instance Finite State Machine logic
     switch(mState)
@@ -163,8 +169,9 @@ void SoundInstance::Update(const double updateTime)
                 return;
             }
 
-            if (!mSoundSource->IsSourcePlaying() && !mSoundDescription.mIsLoop)
+            if (!mSoundSource->IsSourcePlaying() /*&& !mSoundDescription.mIsLoop*/)
             {
+				Stop();
                 mState = SoundState::STOPPED;
                 return;
             }
@@ -173,24 +180,25 @@ void SoundInstance::Update(const double updateTime)
         }
 
         case SoundState::STOPPING:
-        {
-            mFader->Update(updateTime);
+		{
+			if (!mFader || !mSoundSource->IsSourcePlaying())
+			{
+				Stop();
+				mState = SoundState::STOPPED;
+				return;
+			}
+			
+			if (mFader->IsFinished())
+			{
+ 				Stop();
+				mState = SoundState::STOPPED;
+				mSoundSource->SetVolume(mSoundDescription.mDefaultVolume);
+				return;
+			}	
 
-            // Here we sholud pass the current fade volume and multiply it with the source volume
-            // UpdateInstanceParameters();
-
-            if (mFader->IsFinished())
-            {
-                Stop();
-                mState = SoundState::STOPPED;
-                return;
-            }
-
-            if (mState != SoundState::PLAYING || !mSoundSource->IsSourcePlaying())
-            {
-                mState = SoundState::STOPPED;
-                return;
-            }
+			mFader->Update(updateTime.count());
+			mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
+			// UpdateInstanceParameters();
 
             break;
         }

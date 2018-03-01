@@ -24,6 +24,8 @@ public:
     double GetPitch() override { return mSound.getPitch(); }
     double GetVolume() override { return mSound.getVolume(); }
 
+	bool IsSourcePlaying() override { return mSound.getStatus(); }
+
 private:
     SoundEffect(const SoundDescription soundDescription)
     {
