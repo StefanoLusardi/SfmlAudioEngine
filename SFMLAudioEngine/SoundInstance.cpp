@@ -2,6 +2,7 @@
 #include "SoundFactory.h"
 #include "AudioEngine.h"
 #include <cassert>
+#include <iostream>
 
 // Initialize SoundFactory static map of SoundSource constructors
 std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(const SoundDescription)>> SoundFactory::mCreator = {};
@@ -91,6 +92,21 @@ void SoundInstance::SetPitch(const double pitch, const bool isIncremental) const
     mSoundSource->SetPitch(newPitch);
 }
 
+void SoundInstance::SetPosition(const Vector3d& position, const bool isIncremental)
+{
+	if (!isIncremental)
+	{
+		mSoundSource->SetPosition(position);
+		return;
+	}
+
+	// Sum and clip pitch in range [0.001 ; +inf]
+	auto newPosition = mSoundSource->GetPosition();
+	newPosition += position;
+
+	mSoundSource->SetPosition(newPosition);
+}
+
 void SoundInstance::Play() const
 {
     mSoundSource->Play();
@@ -161,20 +177,29 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
         }
 
         case SoundState::PLAYING:
-        {
-            // UpdateInstanceParameters();
-            if (mStopRequest || mState != SoundState::PLAYING )
-            {
-                mState = SoundState::STOPPING;
-                return;
-            }
+		{
+			// UpdateInstanceParameters();
+			if (mStopRequest || mState != SoundState::PLAYING)
+			{
+				mState = SoundState::STOPPING;
+				return;
+			}
 
-            if (!mSoundSource->IsSourcePlaying() /*&& !mSoundDescription.mIsLoop*/)
-            {
+			if (!mSoundSource->IsSourcePlaying() /*&& !mSoundDescription.mIsLoop*/)
+			{
 				Stop();
-                mState = SoundState::STOPPED;
-                return;
-            }
+				mState = SoundState::STOPPED;
+				return;
+			}
+
+			if (mFader && !mFader->IsFinished())
+			{
+				// Setter here, please!
+				mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
+				mVolume = mFader->GetValue();
+
+				mFader->Update(updateTime.count());
+			}
 
             break;
         }
@@ -196,9 +221,13 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 				return;
 			}	
 
-			mFader->Update(updateTime.count());
-			mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
 			// UpdateInstanceParameters();
+
+			// Setter here, please!
+			mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
+			mVolume = mFader->GetValue();
+
+			mFader->Update(updateTime.count());
 
             break;
         }

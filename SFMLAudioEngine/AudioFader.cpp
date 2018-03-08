@@ -19,6 +19,7 @@ void AudioFader::Reset(const double initialVolume
 	mDeltaTime     = deltaTimeMilliseconds;
     mTargetVolume  = targetVolume;
     mInitialVolume = initialVolume;
+	mCurrentVolume = initialVolume;
 	mStep = (targetVolume - initialVolume) / deltaTimeMilliseconds;
 }
 

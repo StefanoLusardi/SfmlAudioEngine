@@ -30,6 +30,8 @@ private:
     std::vector<std::shared_ptr<sf::Rect<int>>> mPitchDwColliderStrip{};
     std::vector<std::shared_ptr<sf::Rect<int>>> mVolumeUpColliderStrip{};
     std::vector<std::shared_ptr<sf::Rect<int>>> mVolumeDwColliderStrip{};
+	std::vector<std::shared_ptr<sf::Rect<int>>> mMoveRightColliderStrip{};
+	std::vector<std::shared_ptr<sf::Rect<int>>> mMoveLeftColliderStrip{};
 
     std::vector<std::shared_ptr<sf::RectangleShape>> mPlayButtonStrip{};
     std::vector<std::shared_ptr<sf::RectangleShape>> mStopButtonStrip{};
@@ -37,5 +39,7 @@ private:
     std::vector<std::shared_ptr<sf::RectangleShape>> mPitchDwButtonStrip{};
     std::vector<std::shared_ptr<sf::RectangleShape>> mVolumeUpButtonStrip{};
     std::vector<std::shared_ptr<sf::RectangleShape>> mVolumeDwButtonStrip{};
+	std::vector<std::shared_ptr<sf::RectangleShape>> mMoveRightButtonStrip{};
+	std::vector<std::shared_ptr<sf::RectangleShape>> mMoveLeftButtonStrip{};
 };
 

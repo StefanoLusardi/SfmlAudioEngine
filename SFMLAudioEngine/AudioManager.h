@@ -28,7 +28,7 @@ public:
     void LoadSound(const std::string soundName) const;
     void UnloadSound(const std::string soundName) const;
 
-    void PlaySound(const std::string soundName, const Vector3d& position, const double volume) const;
+    void PlaySound(const std::string soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds) const;
     void StopSound(const std::string soundName, const double fadeoutMilliseconds) const;
     void PauseSound(const std::string soundName) const;
 
@@ -36,8 +36,9 @@ public:
 
     void SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental) const;
     void SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental) const;
+	void SetSoundPosition(const std::string& soundName, const Vector3d position, const bool isIncremental) const;
 
-    //void StopAllSounds();
+	//void StopAllSounds();
     //void SetSoundPosition(const SoundId id);
     //void SetSoundVolume(const SoundId id);
 

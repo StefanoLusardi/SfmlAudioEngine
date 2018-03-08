@@ -1,4 +1,6 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio/Listener.hpp>
+
 #include <chrono>
 #include "AudioManager.h"
 #include "UserInterface.h"
@@ -12,6 +14,11 @@ int main(int argc, char* argv[])
     const PolyphonyManager polyphonyManager{32, 32};
     AudioManager audio{polyphonyManager};
 
+	// Setup the listener (this needs to be wrapped and moved somewhere else)
+	sf::Listener::setPosition(0.f, 0.f, 0.f);
+	sf::Listener::setDirection(0.f, 0.f, -1.f);
+	sf::Listener::setUpVector(0.f, 1.f, 0.f);
+
     // Register all the sounds in the Mock namespace
     audio.RegisterSounds(Mock::GetSoundsDescriptions());
 
@@ -19,7 +26,7 @@ int main(int argc, char* argv[])
     for (const auto& soundDescription : Mock::GetSoundsDescriptions())
         audio.LoadSound(soundDescription.mSoundName);
 
-    sf::RenderWindow window(sf::VideoMode(845, 635), "SFML Audio Engine");
+    sf::RenderWindow window(sf::VideoMode(845, 840), "SFML Audio Engine");
     UserInterface userInterface{window, audio, Mock::GetSoundsDescriptions() };
 
     auto start = std::chrono::system_clock::now();

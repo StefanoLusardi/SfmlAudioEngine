@@ -130,7 +130,7 @@ void AudioEngine::Update(const std::chrono::duration<double, std::milli> updateT
         mInstances.erase(it);
 }
 
-SoundId AudioEngine::PlaySound(const std::string soundName, const Vector3d& position, const double volume)
+SoundId AudioEngine::PlaySound(const std::string soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds)
 {
     // At the moment there is no control over the active instance counter.
     // In order to limit the polyphony (or just to clamp at a maximum number of active voices),
@@ -144,6 +144,10 @@ SoundId AudioEngine::PlaySound(const std::string soundName, const Vector3d& posi
         return -1;
 
     mInstances[instanceId] = std::make_unique<SoundInstance>(*this, sound, position, volume);
+
+	if (fadeinMilliseconds > 0.0f)
+		mInstances[instanceId]->StartFade(fadeinMilliseconds, 1.0f);
+
     return instanceId;
 }
 
@@ -191,4 +195,13 @@ void AudioEngine::SetSoundPitch(const std::string& soundName, const double pitch
         return;
 
     sound->second->SetPitch(pitch, isIncremental);
+}
+
+void AudioEngine::SetSoundPosition(const std::string& soundName, const Vector3d& position, const bool isIncremental)
+{
+	const auto sound = FindInstance(soundName);
+	if (sound == mInstances.end())
+		return;
+
+	sound->second->SetPosition(position, isIncremental);
 }

@@ -78,6 +78,24 @@ UserInterface::UserInterface(sf::RenderWindow& parent, AudioManager& audioManage
         auto colliderPitchDw = std::make_shared<sf::Rect<int>>(buttonPitchDw->getGlobalBounds());
         mPitchDwColliderStrip.push_back(colliderPitchDw);
 
+		// Position - Move Right
+		auto buttonMoveRight = std::make_shared<sf::RectangleShape>();
+		buttonMoveRight->setSize({ rectSize, rectSize });
+		buttonMoveRight->setPosition(xPosition, 6 * rectSize + 7 * xDelta);
+		buttonMoveRight->setFillColor(sf::Color::Magenta);
+		mMoveRightButtonStrip.push_back(buttonMoveRight);
+		auto colliderMoveRight = std::make_shared<sf::Rect<int>>(buttonMoveRight->getGlobalBounds());
+		mMoveRightColliderStrip.push_back(colliderMoveRight);
+
+		// Position - Move Left
+		auto buttonMoveLeft = std::make_shared<sf::RectangleShape>();
+		buttonMoveLeft->setSize({ rectSize, rectSize });
+		buttonMoveLeft->setPosition(xPosition, 7 * rectSize + 8 * xDelta);
+		buttonMoveLeft->setFillColor(sf::Color::Magenta);
+		mMoveLeftButtonStrip.push_back(buttonMoveLeft);
+		auto colliderMoveLeft = std::make_shared<sf::Rect<int>>(buttonMoveLeft->getGlobalBounds());
+		mMoveLeftColliderStrip.push_back(colliderMoveLeft);
+
         xPosition += buttonPlay->getSize().x + xDelta;
     }
 }
@@ -90,7 +108,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
     {
         if (collider->contains(mousePosition))
         {
-            mAudioManager.PlaySound(mSoundDescriptions[idx].mSoundName, {}, 1);
+            mAudioManager.PlaySound(mSoundDescriptions[idx].mSoundName, {0, 0, 0}, 0.0, 1000.0);
             return;
         }
         ++idx;
@@ -155,6 +173,30 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
         }
         ++idx;
     }
+
+	// Position - Move Left
+	idx = 0;
+	for (const auto& collider : mMoveLeftColliderStrip)
+	{
+		if (collider->contains(mousePosition))
+		{
+			mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { 1.0, 0.0, 0.0 }, true);
+			return;
+		}
+		++idx;
+	}
+
+	// Position - Move Right
+	idx = 0;
+	for (const auto& collider : mMoveRightColliderStrip)
+	{
+		if (collider->contains(mousePosition))
+		{
+			mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { -1.0, 0.0, 0.0 }, true);
+			return;
+		}
+		++idx;
+	}
 }
 
 void UserInterface::draw()
@@ -179,4 +221,10 @@ void UserInterface::draw()
 
     for (const auto& button : mPitchDwButtonStrip)
         mParent.draw(*button);
+
+	for (const auto& button : mMoveRightButtonStrip)
+		mParent.draw(*button);
+
+	for (const auto& button : mMoveLeftButtonStrip)
+		mParent.draw(*button);
 }

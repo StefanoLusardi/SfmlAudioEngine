@@ -59,7 +59,6 @@ private:
     //Interpolator mAmplitude;
     //Interpolator mFrequency;
 
-
     // Increment and keep phase wraped in the [0..2pi] range.
     // Must be called after each new generated sample.
     void UpdatePhase()
@@ -86,13 +85,6 @@ private:
             UpdatePhase();
         }
 
-        /*for (int i = 0; i < mBuffer.size(); ++i)
-        {
-            mBuffer[i] = mAmplitude.getValue() * std::sin(mPhase) * 32767;
-            mPhaseIncrement = (TWO_PI * mFrequency.getValue() / mSampleRate);
-            UpdatePhase();
-        }*/
-
         // Set the pointer to the next audio samples to be played
         data.samples = &mBuffer.front();
         data.sampleCount = mBuffer.size();
@@ -116,9 +108,11 @@ public:
     void SetLoop(const bool /*isLoop*/) override { /* Oscillators are always looping by definition */ }
     void SetPitch(const double pitch) override   { mOscillator->setPitch(pitch); }
     void SetVolume(const double volume) override { mOscillator->setVolume(volume); }
-
+	void SetPosition(const AudioUtils::Vector3d position) override { mOscillator->setPosition(position.x, position.y, position.z); }
+	
     double GetPitch() override { return mOscillator->getPitch(); }
     double GetVolume() override { return mOscillator->getVolume(); }
+	AudioUtils::Vector3d GetPosition() override { return AudioUtils::Vector3d(mOscillator->getPosition()); }
 
 	bool IsSourcePlaying() override { return mOscillator->getStatus(); }
 
@@ -128,6 +122,9 @@ private:
     {
         Oscillator::SetLoop(soundDescription.mIsLoop);
         Oscillator::SetVolume(soundDescription.mDefaultVolume);
+		
+    	// Just for debug the 3d positioning. To be removed later.
+    	mOscillator->setRelativeToListener(false);
     }
 
     std::unique_ptr<StreamOscillator> mOscillator;

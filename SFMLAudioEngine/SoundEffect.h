@@ -20,6 +20,10 @@ public:
     void SetLoop(const bool isLoop) override     { mSound.setLoop(isLoop); }
     void SetPitch(const double pitch) override   { mSound.setPitch(pitch); }
     void SetVolume(const double volume) override { mSound.setVolume(volume); }
+	
+	// Spatialization works only for mono sounds
+	void SetPosition(const AudioUtils::Vector3d position) override { mSound.setPosition(position.x, position.y, position.z); }
+	AudioUtils::Vector3d GetPosition() override { return AudioUtils::Vector3d(mSound.getPosition()); }
 
     double GetPitch() override { return mSound.getPitch(); }
     double GetVolume() override { return mSound.getVolume(); }
