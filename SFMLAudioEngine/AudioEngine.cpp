@@ -3,17 +3,24 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <SFML/Audio/Listener.hpp>
 
 AudioEngine::AudioEngine()
 : mNextInstanceId{ 0 }
 {
     SoundFactory::Initialize();
+	sf::Listener::setPosition(0.f, 0.f, 0.f);
+	sf::Listener::setDirection(0.f, 0.f, -1.f);
+	sf::Listener::setUpVector(0.f, 1.f, 0.f);
 }
 
 AudioEngine::AudioEngine(const PolyphonyManager& polyphonyManager)
 : mNextInstanceId{ 0 }
 {
     SoundFactory::Initialize();
+	sf::Listener::setPosition(0.f, 0.f, 0.f);
+	sf::Listener::setDirection(0.f, 0.f, -1.f);
+	sf::Listener::setUpVector(0.f, 1.f, 0.f);
     mMaxInstances = polyphonyManager.GetMaxInstances();
 }
 
@@ -34,7 +41,7 @@ bool AudioEngine::IsInstanciated(const std::string soundName)
 /**
  * Helper function to retrieve a pair of mSounds map given a sound name
  */
-const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator 
+std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator 
 AudioEngine::FindSound(const std::string soundName)
 {    
     return std::find_if(mSounds.begin(), mSounds.end(),
@@ -45,7 +52,7 @@ AudioEngine::FindSound(const std::string soundName)
 /**
 * Helper function to retrieve a pair of mInstances map given a sound name
 */
-const std::map<const SoundId, std::unique_ptr<SoundInstance>>::iterator
+std::map<const SoundId, std::unique_ptr<SoundInstance>>::iterator
 AudioEngine::FindInstance(const std::string soundName)
 {
     return std::find_if(mInstances.begin(), mInstances.end(),
@@ -163,13 +170,16 @@ void AudioEngine::StopSound(const std::string soundName, const double fadeoutMil
     sound->second->SetStopRequest(true);
 }
 
-void AudioEngine::PauseSound(const std::string soundName)
+void AudioEngine::PauseSound(const std::string soundName, const double fadeoutMilliseconds)
 {
     const auto sound = FindInstance(soundName);
     if (sound == mInstances.end())
         return;
 
-    sound->second->Pause();
+	if (fadeoutMilliseconds > 0.0f)
+		sound->second->StartFade(fadeoutMilliseconds, 0.0f);
+
+    sound->second->SetPauseRequest(true);
 }
 
 void AudioEngine::StopAllSounds()
@@ -178,6 +188,17 @@ void AudioEngine::StopAllSounds()
         sound.second->SetStopRequest(true);
 }
 
+void AudioEngine::PauseAllSounds()
+{
+	for (const auto& sound : mInstances)
+		sound.second->SetPauseRequest(true);
+}
+
+void AudioEngine::ResumeAllSounds()
+{
+	for (const auto& sound : mInstances)
+		sound.second->SetStopRequest(true);
+}
 
 void AudioEngine::SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental)
 {
@@ -204,4 +225,24 @@ void AudioEngine::SetSoundPosition(const std::string& soundName, const Vector3d&
 		return;
 
 	sound->second->SetPosition(position, isIncremental);
+}
+
+void AudioEngine::SetGlobalVolume(const double globalVolume) const
+{
+	sf::Listener::setGlobalVolume(globalVolume);
+}
+
+void AudioEngine::SetListenerPosition(const Vector3d& vPosition) const
+{
+	sf::Listener::setPosition(vPosition.x, vPosition.y, vPosition.z);
+}
+
+void AudioEngine::SetListenerDirection(const Vector3d& vDirection) const
+{
+	sf::Listener::setDirection(vDirection.x, vDirection.y, vDirection.z);
+}
+
+void AudioEngine::SetListenerUpVector(const Vector3d& vUp) const
+{
+	sf::Listener::setUpVector(vUp.x, vUp.y, vUp.z);
 }

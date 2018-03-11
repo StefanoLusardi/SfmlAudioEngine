@@ -25,7 +25,8 @@ private:
     std::vector<SoundDescription> mSoundDescriptions;
 
     std::vector<std::shared_ptr<sf::Rect<int>>> mPlayColliderStrip{};
-    std::vector<std::shared_ptr<sf::Rect<int>>> mStopColliderStrip{};
+	std::vector<std::shared_ptr<sf::Rect<int>>> mStopColliderStrip{};
+	std::vector<std::shared_ptr<sf::Rect<int>>> mPauseColliderStrip{};
     std::vector<std::shared_ptr<sf::Rect<int>>> mPitchUpColliderStrip{};
     std::vector<std::shared_ptr<sf::Rect<int>>> mPitchDwColliderStrip{};
     std::vector<std::shared_ptr<sf::Rect<int>>> mVolumeUpColliderStrip{};
@@ -35,6 +36,7 @@ private:
 
     std::vector<std::shared_ptr<sf::RectangleShape>> mPlayButtonStrip{};
     std::vector<std::shared_ptr<sf::RectangleShape>> mStopButtonStrip{};
+	std::vector<std::shared_ptr<sf::RectangleShape>> mPauseButtonStrip{};
     std::vector<std::shared_ptr<sf::RectangleShape>> mPitchUpButtonStrip{};
     std::vector<std::shared_ptr<sf::RectangleShape>> mPitchDwButtonStrip{};
     std::vector<std::shared_ptr<sf::RectangleShape>> mVolumeUpButtonStrip{};

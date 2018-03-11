@@ -23,6 +23,8 @@ namespace AudioUtils
         double z;
     };
 
+
+
 	inline double DistanceToAttenuation(const double maxDistance, const double minDistance)
 	{
 		return 999 / (maxDistance / minDistance - 1);

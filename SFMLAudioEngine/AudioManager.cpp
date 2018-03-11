@@ -56,6 +56,21 @@ void AudioManager::SetSoundPosition(const std::string& soundName, const Vector3d
 	mAudioEngine->SetSoundPosition(soundName, position, isIncremental);
 }
 
+void AudioManager::StopAllSounds() const
+{
+	mAudioEngine->StopAllSounds();
+}
+
+void AudioManager::PauseAllSounds() const
+{
+	mAudioEngine->PauseAllSounds();
+}
+
+void AudioManager::ResumeAllSounds() const
+{
+	mAudioEngine->ResumeAllSounds();
+}
+
 void AudioManager::LoadSound(const std::string soundName) const
 {
     mAudioEngine->LoadSound(soundName);    
@@ -76,7 +91,27 @@ void AudioManager::StopSound(const std::string soundName, const double fadeoutMi
     mAudioEngine->StopSound(soundName, fadeoutMilliseconds);
 }
 
-void AudioManager::PauseSound(const std::string soundName) const
+void AudioManager::PauseSound(const std::string soundName, const double fadeoutMilliseconds) const
 {
-    mAudioEngine->PauseSound(soundName);
+    mAudioEngine->PauseSound(soundName, fadeoutMilliseconds);
+}
+
+void AudioManager::SetGlobalVolume(const double globalVolume) const
+{
+	mAudioEngine->SetGlobalVolume(globalVolume);
+}
+
+void AudioManager::SetListenerPosition(const Vector3d& vPosition) const
+{
+	mAudioEngine->SetListenerPosition(vPosition);
+}
+
+void AudioManager::SetListenerDirection(const Vector3d& vDirection) const
+{
+	mAudioEngine->SetListenerDirection(vDirection);
+}
+
+void AudioManager::SetListenerUpVector(const Vector3d& vUp) const
+{
+	mAudioEngine->SetListenerUpVector(vUp);
 }

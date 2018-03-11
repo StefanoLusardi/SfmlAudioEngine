@@ -1,8 +1,6 @@
 #include "AudioFader.h"
 
-AudioFader::AudioFader(const double initialVolume
-	, const double targetVolume
-	, const double deltaTimeMilliseconds)
+AudioFader::AudioFader(const double initialVolume, const double targetVolume, const double deltaTimeMilliseconds)
 {
     Reset(initialVolume, targetVolume, deltaTimeMilliseconds);
 }
@@ -11,9 +9,7 @@ AudioFader::~AudioFader()
 {
 }
 
-void AudioFader::Reset(const double initialVolume
-	, const double targetVolume
-	, const double deltaTimeMilliseconds)
+void AudioFader::Reset(const double initialVolume, const double targetVolume, const double deltaTimeMilliseconds)
 {
 	mCurrentTime   = 0;
 	mDeltaTime     = deltaTimeMilliseconds;

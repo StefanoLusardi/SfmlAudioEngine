@@ -1,10 +1,8 @@
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio/Listener.hpp>
-
-#include <chrono>
 #include "AudioManager.h"
 #include "UserInterface.h"
 #include "Mock.h"
+#include <chrono>
 
 using namespace std::literals::chrono_literals;
 
@@ -12,29 +10,28 @@ int main(int argc, char* argv[])
 {
     // Setup Polyphony Manager and instanciate Audio Engine which handles the Audio Engine
     const PolyphonyManager polyphonyManager{32, 32};
-    AudioManager audio{polyphonyManager};
+    AudioManager audioManager{polyphonyManager};
 
-	// Setup the listener (this needs to be wrapped and moved somewhere else)
-	sf::Listener::setPosition(0.f, 0.f, 0.f);
-	sf::Listener::setDirection(0.f, 0.f, -1.f);
-	sf::Listener::setUpVector(0.f, 1.f, 0.f);
+	// This information should be provided in Json or XML format
+	const auto soundDescriptions = Mock::GetSoundsDescriptions();
 
     // Register all the sounds in the Mock namespace
-    audio.RegisterSounds(Mock::GetSoundsDescriptions());
+	audioManager.RegisterSounds(soundDescriptions);
 
     // Load all the sounds in the Mock namespace
-    for (const auto& soundDescription : Mock::GetSoundsDescriptions())
-        audio.LoadSound(soundDescription.mSoundName);
+    for (const auto& soundDescription : soundDescriptions)
+		audioManager.LoadSound(soundDescription.mSoundName);
 
-    sf::RenderWindow window(sf::VideoMode(845, 840), "SFML Audio Engine");
-    UserInterface userInterface{window, audio, Mock::GetSoundsDescriptions() };
+    sf::RenderWindow window(sf::VideoMode(5 + 105 * soundDescriptions.size(), 945), "SFML Audio Engine");
+    UserInterface userInterface{window, audioManager, Mock::GetSoundsDescriptions() };
 
     auto start = std::chrono::system_clock::now();
     auto end   = std::chrono::system_clock::now();
 
-	// Do not auto here!
+	// Do not declare elapsedTimeMillisec as auto!
 	std::chrono::duration<double, std::milli> elapsedTimeMillisec = 0ms;
 
+	// Game Loop
     while (window.isOpen())
     {
         start = std::chrono::system_clock::now();
@@ -54,9 +51,8 @@ int main(int argc, char* argv[])
 
         // Update Audio Engine
         end = std::chrono::system_clock::now();
-		//elapsedTimeMillisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 		elapsedTimeMillisec = end - start;
-        audio.Update(elapsedTimeMillisec);
+		audioManager.Update(elapsedTimeMillisec);
     }
 
     return 0;

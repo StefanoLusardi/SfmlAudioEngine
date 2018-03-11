@@ -30,7 +30,7 @@ public:
 
     void PlaySound(const std::string soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds) const;
     void StopSound(const std::string soundName, const double fadeoutMilliseconds) const;
-    void PauseSound(const std::string soundName) const;
+    void PauseSound(const std::string soundName, const double fadeoutMilliseconds) const;
 
     void Update(const std::chrono::duration<double, std::milli> updateTime) const;
 
@@ -38,11 +38,14 @@ public:
     void SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental) const;
 	void SetSoundPosition(const std::string& soundName, const Vector3d position, const bool isIncremental) const;
 
-	//void StopAllSounds();
-    //void SetSoundPosition(const SoundId id);
-    //void SetSoundVolume(const SoundId id);
+	void StopAllSounds() const;
+	void PauseAllSounds() const;
+	void ResumeAllSounds() const;
+	void SetGlobalVolume(const double globalVolume) const;
 
-    //void SetListener(const Vector3d& vPosition, const Vector3d& vLook, const Vector3d& vUp);
+	void SetListenerPosition(const Vector3d& vPosition) const;
+	void SetListenerDirection(const Vector3d& vDirection) const;
+	void SetListenerUpVector(const Vector3d& vUp) const;
 
 private:
     std::unique_ptr<AudioEngine, std::function<void(AudioEngine*)>> mAudioEngine;

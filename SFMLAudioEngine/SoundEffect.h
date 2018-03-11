@@ -43,7 +43,6 @@ private:
     , mBuffer{buffer}
     { }
 
-private:
     sf::Sound       mSound;
     sf::SoundBuffer mBuffer;
 };

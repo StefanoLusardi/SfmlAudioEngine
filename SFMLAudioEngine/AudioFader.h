@@ -4,7 +4,7 @@
 class AudioFader
 {
 public:
-    AudioFader(const double initialVolume, const double targetVolume, double deltaTime);
+    explicit AudioFader(const double initialVolume, const double targetVolume, double deltaTime);
     ~AudioFader();
 
     void Reset(const double initialVolume, const double targetVolume, double deltaTime);

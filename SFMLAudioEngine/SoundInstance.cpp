@@ -14,16 +14,22 @@ SoundInstance::SoundInstance(AudioEngine& engine
       : mEngine{engine}
       , mSoundDescription{sound->first}
       , mSoundSource{sound->second}
+	  , mFader{nullptr}
       , mState{SoundState::INITIALIZE}
       , mPosition{position}
       , mVolume{volume}
       , mStopRequest{false}
+	  , mPauseRequest{false}
 {
-	mFader = nullptr;
 }
 
 SoundInstance::~SoundInstance()
 {
+}
+
+void SoundInstance::SetPauseRequest(const bool pauseRequest)
+{
+	mPauseRequest = pauseRequest;
 }
 
 void SoundInstance::SetStopRequest(const bool stopRequest)
@@ -36,10 +42,10 @@ bool SoundInstance::GetStopRequest() const
     return mStopRequest;
 }
 
-void SoundInstance::StartFade(const double fadeoutMilliseconds, const double targetVolume = 0) 
+void SoundInstance::StartFade(const double fadeoutMilliseconds, const double targetVolume = 0)
 {
-	mFader = std::make_unique<AudioFader>(1, 1, 1);
-    mFader->Reset(mVolume, targetVolume, fadeoutMilliseconds);
+	mFader = std::make_unique<AudioFader>(mVolume, targetVolume, fadeoutMilliseconds);
+    //mFader->Reset(mVolume, targetVolume, fadeoutMilliseconds);
 }
 
 const SoundInstance::SoundState SoundInstance::GetState() const
@@ -92,7 +98,7 @@ void SoundInstance::SetPitch(const double pitch, const bool isIncremental) const
     mSoundSource->SetPitch(newPitch);
 }
 
-void SoundInstance::SetPosition(const Vector3d& position, const bool isIncremental)
+void SoundInstance::SetPosition(const Vector3d& position, const bool isIncremental) const
 {
 	if (!isIncremental)
 	{
@@ -122,9 +128,10 @@ void SoundInstance::Pause() const
     mSoundSource->Pause();
 }
 
-void SoundInstance::ResetSoundSource()
+void SoundInstance::ResetSoundSource() const
 {
 	mSoundSource->setVolume(mSoundDescription.mDefaultVolume);
+	mSoundSource->setPitch(mSoundDescription.mDefaultPitch);
 }
 
 void SoundInstance::Update(const std::chrono::duration<double, std::milli> updateTime)
@@ -135,13 +142,20 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
         // The fallthrough attribute requires C++17
         case SoundState::INITIALIZE: //[[fallthrough]];
         case SoundState::TOPLAY:
-        {
+        {			
             if (mStopRequest)
             {
                 mState = SoundState::STOPPING;
                 return;
             }
 
+			if (mPauseRequest)
+			{
+				mState = SoundState::PAUSING;
+				return;
+			}
+
+			// The sound to be played is not loaded --> Load it.
             if (!mEngine.IsLoaded(mSoundDescription.mSoundName))
             {
                 mEngine.LoadSound(mSoundDescription.mSoundName);
@@ -149,25 +163,20 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
                 return;
             }
 
-            if (mEngine.IsLoaded(mSoundDescription.mSoundName))
+            // The sound is already loaded and instanciated --> Play it.
+            if (mEngine.IsInstanciated(mSoundDescription.mSoundName))
             {
-                if (mEngine.IsInstanciated(mSoundDescription.mSoundName))
-                {
-                    // Here we could check for a required fade in.
-                    // Or using an override Play(const double fadeInTime)
-                    Play();
-                    mState = SoundState::PLAYING;
-                    return;
-                }
-                
-                mState = SoundState::STOPPING;
-            }
+                Play();
+                mState = SoundState::PLAYING;
+                return;
+            }           
 
             break;
         }
 
         case SoundState::LOADING:
         {
+			// Loading is finished --> Set ToPlay.
             if (mEngine.IsLoaded(mSoundDescription.mSoundName))
             {
                 mState = SoundState::TOPLAY;
@@ -179,25 +188,36 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
         case SoundState::PLAYING:
 		{
 			// UpdateInstanceParameters();
+
+			// Stop request is set (or source has chenged its state) --> Set to stopping.
 			if (mStopRequest || mState != SoundState::PLAYING)
 			{
 				mState = SoundState::STOPPING;
 				return;
 			}
 
-			if (!mSoundSource->IsSourcePlaying() /*&& !mSoundDescription.mIsLoop*/)
+			// Pause request is set --> Set to pauseing.
+			if (mPauseRequest)
+			{
+				mState = SoundState::PAUSING;
+				return;
+			}
+
+			// Source is no longer playing (already stopped) --> Set it to stopped. 
+        	// This happens when the source reaches the end of the file before a Stop() is called and the loop is not set.
+			if (!mSoundSource->IsSourcePlaying())
 			{
 				Stop();
 				mState = SoundState::STOPPED;
 				return;
 			}
 
+			// Fade In still in progress --> Update source volume and fader value.
 			if (mFader && !mFader->IsFinished())
 			{
 				// Setter here, please!
 				mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
 				mVolume = mFader->GetValue();
-
 				mFader->Update(updateTime.count());
 			}
 
@@ -206,6 +226,9 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 
         case SoundState::STOPPING:
 		{
+			// UpdateInstanceParameters();
+			
+        	// No Fade Out --> Stop the source.
 			if (!mFader || !mSoundSource->IsSourcePlaying())
 			{
 				Stop();
@@ -213,28 +236,78 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 				return;
 			}
 			
+			// Fade Out is finished --> Stop the source and reset its volume.
 			if (mFader->IsFinished())
 			{
  				Stop();
 				mState = SoundState::STOPPED;
-				mSoundSource->SetVolume(mSoundDescription.mDefaultVolume);
+				mSoundSource->SetVolume(mSoundDescription.mDefaultVolume); // Reset volume to default
 				return;
 			}	
 
-			// UpdateInstanceParameters();
-
-			// Setter here, please!
-			mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
-			mVolume = mFader->GetValue();
-
-			mFader->Update(updateTime.count());
+			// Fade Out still in progress --> Update source volume and fader value.
+			{
+				// Setter here, please!
+				mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
+				mVolume = mFader->GetValue();
+				mFader->Update(updateTime.count());
+				return;
+			}
 
             break;
         }
 
         case SoundState::STOPPED:
         {
+			// Do nothing.
             break;
         }
+
+		case SoundState::PAUSING:
+	    {	        
+			// UpdateInstanceParameters();
+
+			// No Fade Out --> Pause the source.
+			if (!mFader)
+			{
+				Pause();
+				mState = SoundState::PAUSED;
+				return;
+			}
+
+			// Source is no longer playing (already stopped) --> Set it to stopped. 
+			// This happens when the source reaches the end of the file before a Stop() is called and the loop is not set.
+			if (!mSoundSource->IsSourcePlaying())
+			{
+				Stop();
+				mState = SoundState::STOPPED;
+				return;
+			}
+
+			// Fade Out is finished --> Pause the source and keep its properties.
+			if (mFader->IsFinished())
+			{
+				Pause();
+				mState = SoundState::PAUSED;
+				return;
+			}
+
+			// Fade Out still in progress --> Update source volume and fader value.
+			{
+				// Setter here, please!
+				mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
+				mVolume = mFader->GetValue();
+				mFader->Update(updateTime.count());
+				return;
+			}
+
+			break;
+	    }
+
+		case SoundState::PAUSED:
+		{
+			// What to do here?
+			break;
+		}
     }
 }
