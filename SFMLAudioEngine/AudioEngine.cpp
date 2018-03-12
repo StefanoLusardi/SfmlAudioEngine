@@ -139,17 +139,32 @@ void AudioEngine::Update(const std::chrono::duration<double, std::milli> updateT
 
 SoundId AudioEngine::PlaySound(const std::string soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds)
 {
-    // At the moment there is no control over the active instance counter.
-    // In order to limit the polyphony (or just to clamp at a maximum number of active voices),
-    // check if the value of mNextInstanceId is below a fixed threshold, maybe set during the initialization of the AudioEngine. 
-    // Then we need to keep track of the next available slots after an instance is removed from the mInstances map.
-    // So in the future we need a function that makes mNextInstanceId point to the next free slot in the mInstances map.
-    const auto instanceId = mNextInstanceId++;
-
+	// Check that the sound is loaded
     const auto sound = FindSound(soundName);
     if (sound == mSounds.end())
         return -1;
 
+	// Resume a paused Sound Instance
+	const auto pausedInstance = FindInstance(soundName);
+	if (pausedInstance != mInstances.end() &&
+		pausedInstance->second->GetState() == SoundInstance::SoundState::PAUSED)
+	{
+		pausedInstance->second->SetPauseRequest(false);
+
+		if (fadeinMilliseconds > 0.0f)
+			pausedInstance->second->StartFade(fadeinMilliseconds, 1.0f);
+
+		return mNextInstanceId; // unused
+	}
+
+	// At the moment there is no control over the active instance counter.
+	// In order to limit the polyphony (or just to clamp at a maximum number of active voices),
+	// check if the value of mNextInstanceId is below a fixed threshold, maybe set during the initialization of the AudioEngine. 
+	// Then we need to keep track of the next available slots after an instance is removed from the mInstances map.
+	// So in the future we need a function that makes mNextInstanceId point to the next free slot in the mInstances map.
+	const auto instanceId = mNextInstanceId++;
+
+	// Create a new Sound Instance.
     mInstances[instanceId] = std::make_unique<SoundInstance>(*this, sound, position, volume);
 
 	if (fadeinMilliseconds > 0.0f)

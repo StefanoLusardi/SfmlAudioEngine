@@ -306,7 +306,11 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 
 		case SoundState::PAUSED:
 		{
-			// What to do here?
+			if (!mPauseRequest)
+			{
+				mState = SoundState::TOPLAY;
+				return;
+			}
 			break;
 		}
     }
