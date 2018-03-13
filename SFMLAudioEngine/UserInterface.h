@@ -20,6 +20,9 @@ private:
     sf::RenderWindow& mParent;
     AudioManager& mAudioManager;
 
+	const float mDeltaX{ 5.0f };
+	const float mRectSize{ 100.f };
+
     sf::Font mFont;
     std::vector<std::shared_ptr<sf::Text>> mTextStrip{};
     std::vector<SoundDescription> mSoundDescriptions;
@@ -43,5 +46,10 @@ private:
     std::vector<std::shared_ptr<sf::RectangleShape>> mVolumeDwButtonStrip{};
 	std::vector<std::shared_ptr<sf::RectangleShape>> mMoveRightButtonStrip{};
 	std::vector<std::shared_ptr<sf::RectangleShape>> mMoveLeftButtonStrip{};
+
+	void CreateButtonStrip(std::vector<std::shared_ptr<sf::Rect<int>>>& colliderStrip,
+							std::vector<std::shared_ptr<sf::RectangleShape>>& buttonStrip,
+							const sf::Color& buttonColor,
+							const float xPosition, const int rowNumber) const;
 };
 

@@ -196,7 +196,7 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 				return;
 			}
 
-			// Pause request is set --> Set to pauseing.
+			// Pause request is set --> Set to pausing.
 			if (mPauseRequest)
 			{
 				mState = SoundState::PAUSING;
@@ -260,6 +260,7 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
         case SoundState::STOPPED:
         {
 			// Do nothing.
+			// This state is needed by the AudioEngine::Update() to clean up unused sound instances
             break;
         }
 
@@ -306,6 +307,14 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 
 		case SoundState::PAUSED:
 		{
+			// Stop request is set (The sound can be stopped while it's paused) --> Set to stopping.			
+			if (mStopRequest)
+			{
+				mState = SoundState::STOPPING;
+				return;
+			}
+
+			// Pause request unset --> Resume to play.
 			if (!mPauseRequest)
 			{
 				mState = SoundState::TOPLAY;

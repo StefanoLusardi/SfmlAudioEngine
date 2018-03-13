@@ -1,111 +1,61 @@
 #include "UserInterface.h"
 #include "AudioManager.h"
 
-UserInterface::UserInterface(sf::RenderWindow& parent, AudioManager& audioManager, const std::vector<SoundDescription>& soundsDescriptions)
+void UserInterface::CreateButtonStrip(
+	std::vector<std::shared_ptr<sf::Rect<int>>>& colliderStrip, 
+	std::vector<std::shared_ptr<sf::RectangleShape>>& buttonStrip,
+	const sf::Color& buttonColor,
+	const float xPosition,
+	const int rowNumber) const
+{
+	// Create a button
+	auto button = std::make_shared<sf::RectangleShape>();
+	button->setSize({ mRectSize, mRectSize });
+	button->setPosition(xPosition, rowNumber * mRectSize + (rowNumber+1) * mDeltaX);
+	button->setFillColor(buttonColor);
+
+	// Add the button to its button strip
+	buttonStrip.push_back(button);
+
+	// Create a collider for the button and add it to its collider strip
+	const auto collider = std::make_shared<sf::Rect<int>>(button->getGlobalBounds());
+	colliderStrip.push_back(collider);
+}
+
+UserInterface::UserInterface(sf::RenderWindow& parent, 
+	AudioManager& audioManager, 
+	const std::vector<SoundDescription>& soundsDescriptions)
     : mParent{parent}
     , mAudioManager{audioManager}
     , mSoundDescriptions{soundsDescriptions}
 {
     mFont.loadFromFile("../Font/arial.ttf");
+    auto xPosition = mDeltaX;
 
-    // Setup buttons strip
-    const auto xDelta{ 5.0 };
-    const auto rectSize{ 100.f };
-    auto xPosition = xDelta;
-
+	//for (auto soundIndex=0; soundIndex<mSoundDescriptions.size(); ++soundIndex)
     for (const auto& soundDescription : mSoundDescriptions)
     {
-        // Play
-        auto buttonPlay = std::make_shared<sf::RectangleShape>();
-        buttonPlay->setSize({ rectSize, rectSize });
-        buttonPlay->setPosition(xPosition, xDelta);
-        buttonPlay->setFillColor(sf::Color::Green);
-        mPlayButtonStrip.push_back(buttonPlay);        
-        auto colliderPlay = std::make_shared<sf::Rect<int>>(buttonPlay->getGlobalBounds());
-        mPlayColliderStrip.push_back(colliderPlay);
+		int rowNumber = 0;
+		CreateButtonStrip(mPlayColliderStrip,		mPlayButtonStrip,		sf::Color::Green,	xPosition, rowNumber++); // Play
+		CreateButtonStrip(mStopColliderStrip,		mStopButtonStrip,		sf::Color::Red,		xPosition, rowNumber++); // Stop
+		CreateButtonStrip(mPauseColliderStrip,		mPauseButtonStrip,		sf::Color::Blue,	xPosition, rowNumber++); // Pause
+		CreateButtonStrip(mVolumeUpColliderStrip,	mVolumeUpButtonStrip,	sf::Color::Yellow,	xPosition, rowNumber++); // Volume up
+		CreateButtonStrip(mVolumeDwColliderStrip,	mVolumeDwButtonStrip,	sf::Color::Yellow,	xPosition, rowNumber++); // Volume down
+		CreateButtonStrip(mPitchUpColliderStrip,	mPitchUpButtonStrip,	sf::Color::Cyan,	xPosition, rowNumber++); // Pitch up
+		CreateButtonStrip(mPitchDwColliderStrip,	mPitchDwButtonStrip,	sf::Color::Cyan,	xPosition, rowNumber++); // Pitch down
+		CreateButtonStrip(mMoveRightColliderStrip,	mMoveRightButtonStrip,	sf::Color::Magenta, xPosition, rowNumber++); // Position - Move Right
+		CreateButtonStrip(mMoveLeftColliderStrip,	mMoveLeftButtonStrip,	sf::Color::Magenta, xPosition, rowNumber++); // Position - Move Left
 
-        // Stop
-        auto buttonStop = std::make_shared<sf::RectangleShape>();
-        buttonStop->setSize({ rectSize, rectSize });
-        buttonStop->setPosition(xPosition, rectSize + 2 * xDelta);
-        buttonStop->setFillColor(sf::Color::Red);
-        mStopButtonStrip.push_back(buttonStop);
-        auto colliderStop = std::make_shared<sf::Rect<int>>(buttonStop->getGlobalBounds());
-        mStopColliderStrip.push_back(colliderStop);
-        
-		// Stop
-		auto buttonPause = std::make_shared<sf::RectangleShape>();
-		buttonPause->setSize({ rectSize, rectSize });
-		buttonPause->setPosition(xPosition, 2 * rectSize + 3 * xDelta);
-		buttonPause->setFillColor(sf::Color::Blue);
-		mPauseButtonStrip.push_back(buttonPause);
-		auto colliderPause = std::make_shared<sf::Rect<int>>(buttonPause->getGlobalBounds());
-		mPauseColliderStrip.push_back(colliderPause);
+		// Font               
+		auto text = std::make_shared<sf::Text>();
+		text->setString(soundDescription.mSoundName);
+		text->setCharacterSize(18);
+		text->setPosition(xPosition, mDeltaX);
+		text->setFillColor(sf::Color::Black);
+		text->setFont(mFont);
+		mTextStrip.push_back(text);
 
-        // Font               
-        auto text = std::make_shared<sf::Text>();
-        text->setString(soundDescription.mSoundName);
-        text->setCharacterSize(18);
-        text->setPosition(buttonPlay->getPosition());
-        text->setFillColor(sf::Color::Black);
-        text->setFont(mFont);
-        mTextStrip.push_back(text);
-
-        // Volume up
-        auto buttonVolumeUp = std::make_shared<sf::RectangleShape>();
-        buttonVolumeUp->setSize({ rectSize, rectSize });
-        buttonVolumeUp->setPosition(xPosition, 3 * rectSize + 4 * xDelta);
-        buttonVolumeUp->setFillColor(sf::Color::Yellow);
-        mVolumeUpButtonStrip.push_back(buttonVolumeUp);
-        auto colliderVolumeUp = std::make_shared<sf::Rect<int>>(buttonVolumeUp->getGlobalBounds());
-        mVolumeUpColliderStrip.push_back(colliderVolumeUp);
-
-        // Volume down
-        auto buttonVolumeDw = std::make_shared<sf::RectangleShape>();
-        buttonVolumeDw->setSize({ rectSize, rectSize });
-        buttonVolumeDw->setPosition(xPosition, 4 * rectSize + 5 * xDelta);
-        buttonVolumeDw->setFillColor(sf::Color::Yellow);
-        mVolumeDwButtonStrip.push_back(buttonVolumeDw);
-        auto colliderVolumeDw = std::make_shared<sf::Rect<int>>(buttonVolumeDw->getGlobalBounds());
-        mVolumeDwColliderStrip.push_back(colliderVolumeDw);
-
-        // Pitch up
-        auto buttonPitchUp = std::make_shared<sf::RectangleShape>();
-        buttonPitchUp->setSize({ rectSize, rectSize });
-        buttonPitchUp->setPosition(xPosition, 5 * rectSize + 6 * xDelta);
-        buttonPitchUp->setFillColor(sf::Color::Cyan);
-        mPitchUpButtonStrip.push_back(buttonPitchUp);
-        auto colliderPitchUp = std::make_shared<sf::Rect<int>>(buttonPitchUp->getGlobalBounds());
-        mPitchUpColliderStrip.push_back(colliderPitchUp);
-
-        // Pitch down
-        auto buttonPitchDw = std::make_shared<sf::RectangleShape>();
-        buttonPitchDw->setSize({ rectSize, rectSize });
-        buttonPitchDw->setPosition(xPosition, 6 * rectSize + 7 * xDelta);
-        buttonPitchDw->setFillColor(sf::Color::Cyan);
-        mPitchDwButtonStrip.push_back(buttonPitchDw);
-        auto colliderPitchDw = std::make_shared<sf::Rect<int>>(buttonPitchDw->getGlobalBounds());
-        mPitchDwColliderStrip.push_back(colliderPitchDw);
-
-		// Position - Move Right
-		auto buttonMoveRight = std::make_shared<sf::RectangleShape>();
-		buttonMoveRight->setSize({ rectSize, rectSize });
-		buttonMoveRight->setPosition(xPosition, 7 * rectSize + 8 * xDelta);
-		buttonMoveRight->setFillColor(sf::Color::Magenta);
-		mMoveRightButtonStrip.push_back(buttonMoveRight);
-		auto colliderMoveRight = std::make_shared<sf::Rect<int>>(buttonMoveRight->getGlobalBounds());
-		mMoveRightColliderStrip.push_back(colliderMoveRight);
-
-		// Position - Move Left
-		auto buttonMoveLeft = std::make_shared<sf::RectangleShape>();
-		buttonMoveLeft->setSize({ rectSize, rectSize });
-		buttonMoveLeft->setPosition(xPosition, 8 * rectSize + 9 * xDelta);
-		buttonMoveLeft->setFillColor(sf::Color::Magenta);
-		mMoveLeftButtonStrip.push_back(buttonMoveLeft);
-		auto colliderMoveLeft = std::make_shared<sf::Rect<int>>(buttonMoveLeft->getGlobalBounds());
-		mMoveLeftColliderStrip.push_back(colliderMoveLeft);
-
-        xPosition += buttonPlay->getSize().x + xDelta;
+        xPosition += mRectSize + mDeltaX;
     }
 }
 
@@ -153,7 +103,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
     {
         if (collider->contains(mousePosition))
         {
-            mAudioManager.SetSoundVolume(mSoundDescriptions[idx].mSoundName, 25, true);
+            mAudioManager.SetSoundVolume(mSoundDescriptions[idx].mSoundName, 25, true); // Add 25% to the current volume
             return;
         }
         ++idx;
@@ -165,7 +115,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
     {
         if (collider->contains(mousePosition))
         {
-            mAudioManager.SetSoundVolume(mSoundDescriptions[idx].mSoundName, -25, true);
+            mAudioManager.SetSoundVolume(mSoundDescriptions[idx].mSoundName, -25, true); // Subtract 25% to the current volume
             return;
         }
         ++idx;
@@ -177,7 +127,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
     {
         if (collider->contains(mousePosition))
         {
-            mAudioManager.SetSoundPitch(mSoundDescriptions[idx].mSoundName, 0.1, true);
+            mAudioManager.SetSoundPitch(mSoundDescriptions[idx].mSoundName, 0.1, true); // Raise the pitch by 0.1
             return;
         }
         ++idx;
@@ -189,7 +139,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
     {
         if (collider->contains(mousePosition))
         {
-            mAudioManager.SetSoundPitch(mSoundDescriptions[idx].mSoundName, -0.1, true);
+            mAudioManager.SetSoundPitch(mSoundDescriptions[idx].mSoundName, -0.1, true); // Lower the pitch by 0.1
             return;
         }
         ++idx;
@@ -201,7 +151,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
 	{
 		if (collider->contains(mousePosition))
 		{
-			mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { 1.0, 0.0, 0.0 }, true);
+			mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { 1.0, 0.0, 0.0 }, true); // Move left by 1
 			return;
 		}
 		++idx;
@@ -213,7 +163,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition)
 	{
 		if (collider->contains(mousePosition))
 		{
-			mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { -1.0, 0.0, 0.0 }, true);
+			mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { -1.0, 0.0, 0.0 }, true); // Move right by 1
 			return;
 		}
 		++idx;
