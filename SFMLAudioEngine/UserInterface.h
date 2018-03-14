@@ -13,15 +13,18 @@ public:
         sf::RenderWindow& parent
         , AudioManager& audioManager
         , const std::vector<SoundDescription>& soundsDescriptions);
-    void onClick(const sf::Vector2i& mousePosition);
-    void draw();
+    void onClick(const sf::Vector2i& mousePosition) const;
+    void draw() const;
+
+	unsigned int GetUiWidth()  const;
+	unsigned int GetUiHeight() const;
 
 private:
     sf::RenderWindow& mParent;
     AudioManager& mAudioManager;
-
-	const float mDeltaX{ 5.0f };
-	const float mRectSize{ 100.f };
+	
+	static float sButtonDelta;
+	static float mButtonSize;
 
     sf::Font mFont;
     std::vector<std::shared_ptr<sf::Text>> mTextStrip{};
@@ -47,7 +50,9 @@ private:
 	std::vector<std::shared_ptr<sf::RectangleShape>> mMoveRightButtonStrip{};
 	std::vector<std::shared_ptr<sf::RectangleShape>> mMoveLeftButtonStrip{};
 
-	void CreateButtonStrip(std::vector<std::shared_ptr<sf::Rect<int>>>& colliderStrip,
+	const int mControlsNumber{ 9 }; // Number of button strips (and button collider)
+
+	void CreateButton(std::vector<std::shared_ptr<sf::Rect<int>>>& colliderStrip,
 							std::vector<std::shared_ptr<sf::RectangleShape>>& buttonStrip,
 							const sf::Color& buttonColor,
 							const float xPosition, const int rowNumber) const;

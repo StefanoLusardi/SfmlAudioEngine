@@ -23,11 +23,14 @@ namespace AudioUtils
         double z;
     };
 
-
-
 	inline double DistanceToAttenuation(const double maxDistance, const double minDistance)
 	{
 		return 999 / (maxDistance / minDistance - 1);
+	}
+
+	inline double Normalize(const double value, const double norm = 100.0)
+	{
+		return value / norm;
 	}
 
 	//inline double LinearToDb(const double linear)

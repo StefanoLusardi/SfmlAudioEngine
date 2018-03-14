@@ -22,9 +22,15 @@ int main(int argc, char* argv[])
     for (const auto& soundDescription : soundDescriptions)
 		audioManager.LoadSound(soundDescription.mSoundName);
 
-    sf::RenderWindow window(sf::VideoMode(5 + 105 * soundDescriptions.size(), 945), "SFML Audio Engine");
-    UserInterface userInterface{window, audioManager, Mock::GetSoundsDescriptions() };
+	// Create a main window with a UI
+	sf::RenderWindow window(sf::VideoMode(), "SFML Audio Engine", sf::Style::Titlebar | sf::Style::Close);
+    UserInterface ui{window, audioManager, Mock::GetSoundsDescriptions() };
 
+	// Shrink window size to fit available sounds and available features
+	window.setSize(sf::Vector2u{ ui.GetUiWidth(), ui.GetUiHeight() });
+	window.setView(sf::View(sf::FloatRect(0, 0, ui.GetUiWidth(), ui.GetUiHeight())));
+
+	// Initialize tic-toc to compute elapsed time at each game tick
     auto start = std::chrono::system_clock::now();
     auto end   = std::chrono::system_clock::now();
 
@@ -41,12 +47,12 @@ int main(int argc, char* argv[])
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::MouseButtonPressed)
-                userInterface.onClick(sf::Mouse::getPosition(window));
+                ui.onClick(sf::Mouse::getPosition(window));
         }
 
         // Update Ui
         window.clear();
-        userInterface.draw();
+        ui.draw();
         window.display();
 
         // Update Audio Engine

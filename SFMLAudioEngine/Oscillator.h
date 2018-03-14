@@ -78,10 +78,10 @@ private:
         // The number of samples to stream every time the function is called 
         // is equal to the buffer size of the samples vector.
 
+		const auto amp = mAmplitude * mMaxAmp;
         for (int i = 0; i < mBuffer.size(); ++i)
         {
-			//mBuffer[i] = static_cast<sf::Int16>(mAmplitude * std::sin(mPhase));
-            mBuffer[i] = mAmplitude * std::sin(mPhase) * mMaxAmp; // pre-multiply mAmplitude*mMaxAmp
+            mBuffer[i] = amp * std::sin(mPhase); // static_cast<sf::Int16>
             UpdatePhase();
         }
 
@@ -115,6 +115,7 @@ public:
 	AudioUtils::Vector3d GetPosition() override { return AudioUtils::Vector3d(mOscillator->getPosition()); }
 
 	bool IsSourcePlaying() override { return mOscillator->getStatus(); }
+	bool IsMono() override { return true; }
 
 private:
     Oscillator(const SoundDescription soundDescription) 
@@ -122,9 +123,18 @@ private:
     {
         Oscillator::SetLoop(soundDescription.mIsLoop);
         Oscillator::SetVolume(soundDescription.mDefaultVolume);
-		
-    	// Just for debug the 3d positioning. To be removed later.
+
     	mOscillator->setRelativeToListener(false);
+
+		if (soundDescription.mIs3d && Oscillator::IsMono())
+		{
+			mOscillator->setAttenuation(DistanceToAttenuation(soundDescription.mMaxDistance, soundDescription.mMinDistance));
+			mOscillator->setMinDistance(soundDescription.mMinDistance);
+		}
+
+		mOscillator->setLoop(soundDescription.mIsLoop);
+		mOscillator->setPitch(soundDescription.mDefaultPitch);
+		mOscillator->setVolume(soundDescription.mDefaultVolume);
     }
 
     std::unique_ptr<StreamOscillator> mOscillator;

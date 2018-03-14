@@ -29,6 +29,7 @@ public:
     double GetVolume() override { return mSound.getVolume(); }
 
 	bool IsSourcePlaying() override { return mSound.getStatus(); }
+	bool IsMono() override { return mSound.getBuffer()->getChannelCount() == 1; }
 
 private:
     SoundEffect(const SoundDescription soundDescription)
@@ -36,6 +37,16 @@ private:
         mBuffer.loadFromFile("../AudioSamples/" + soundDescription.mSoundName + ".wav");
         mSound.setBuffer(mBuffer);
         SoundEffect::SetLoop(soundDescription.mIsLoop);
+
+		if (soundDescription.mIs3d && SoundEffect::IsMono())
+		{
+			mSound.setAttenuation(DistanceToAttenuation(soundDescription.mMaxDistance, soundDescription.mMinDistance));
+			mSound.setMinDistance(soundDescription.mMinDistance);
+		}
+
+		mSound.setLoop(soundDescription.mIsLoop);
+		mSound.setPitch(soundDescription.mDefaultPitch);
+		mSound.setVolume(soundDescription.mDefaultVolume);
     }
 
     SoundEffect(const sf::Sound& sound, const sf::SoundBuffer& buffer)

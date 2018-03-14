@@ -1,7 +1,17 @@
 #include "UserInterface.h"
 #include "AudioManager.h"
 
-void UserInterface::CreateButtonStrip(
+auto GetUiWidth()
+{
+	
+}
+
+auto GetUiHeight(){}
+
+float UserInterface::sButtonDelta{ 5.0f };
+float UserInterface::mButtonSize{ 100.f };
+
+void UserInterface::CreateButton(
 	std::vector<std::shared_ptr<sf::Rect<int>>>& colliderStrip, 
 	std::vector<std::shared_ptr<sf::RectangleShape>>& buttonStrip,
 	const sf::Color& buttonColor,
@@ -10,8 +20,8 @@ void UserInterface::CreateButtonStrip(
 {
 	// Create a button
 	auto button = std::make_shared<sf::RectangleShape>();
-	button->setSize({ mRectSize, mRectSize });
-	button->setPosition(xPosition, rowNumber * mRectSize + (rowNumber+1) * mDeltaX);
+	button->setSize({ mButtonSize, mButtonSize });
+	button->setPosition(xPosition, rowNumber * mButtonSize + (rowNumber+1) * sButtonDelta);
 	button->setFillColor(buttonColor);
 
 	// Add the button to its button strip
@@ -30,147 +40,160 @@ UserInterface::UserInterface(sf::RenderWindow& parent,
     , mSoundDescriptions{soundsDescriptions}
 {
     mFont.loadFromFile("../Font/arial.ttf");
-    auto xPosition = mDeltaX;
+    auto xPosition = sButtonDelta;
 
-	//for (auto soundIndex=0; soundIndex<mSoundDescriptions.size(); ++soundIndex)
-    for (const auto& soundDescription : mSoundDescriptions)
+	// Global Engine controls
+    {
+	    
+    }
+
+	// Sound specific controls
+	for (const auto& soundDescription : mSoundDescriptions)
     {
 		int rowNumber = 0;
-		CreateButtonStrip(mPlayColliderStrip,		mPlayButtonStrip,		sf::Color::Green,	xPosition, rowNumber++); // Play
-		CreateButtonStrip(mStopColliderStrip,		mStopButtonStrip,		sf::Color::Red,		xPosition, rowNumber++); // Stop
-		CreateButtonStrip(mPauseColliderStrip,		mPauseButtonStrip,		sf::Color::Blue,	xPosition, rowNumber++); // Pause
-		CreateButtonStrip(mVolumeUpColliderStrip,	mVolumeUpButtonStrip,	sf::Color::Yellow,	xPosition, rowNumber++); // Volume up
-		CreateButtonStrip(mVolumeDwColliderStrip,	mVolumeDwButtonStrip,	sf::Color::Yellow,	xPosition, rowNumber++); // Volume down
-		CreateButtonStrip(mPitchUpColliderStrip,	mPitchUpButtonStrip,	sf::Color::Cyan,	xPosition, rowNumber++); // Pitch up
-		CreateButtonStrip(mPitchDwColliderStrip,	mPitchDwButtonStrip,	sf::Color::Cyan,	xPosition, rowNumber++); // Pitch down
-		CreateButtonStrip(mMoveRightColliderStrip,	mMoveRightButtonStrip,	sf::Color::Magenta, xPosition, rowNumber++); // Position - Move Right
-		CreateButtonStrip(mMoveLeftColliderStrip,	mMoveLeftButtonStrip,	sf::Color::Magenta, xPosition, rowNumber++); // Position - Move Left
+		CreateButton(mPlayColliderStrip,		mPlayButtonStrip,		sf::Color::Green,	xPosition, rowNumber++); // Play
+		CreateButton(mStopColliderStrip,		mStopButtonStrip,		sf::Color::Red,		xPosition, rowNumber++); // Stop
+		CreateButton(mPauseColliderStrip,		mPauseButtonStrip,		sf::Color::Blue,	xPosition, rowNumber++); // Pause
+		CreateButton(mVolumeUpColliderStrip,	mVolumeUpButtonStrip,	sf::Color::Yellow,	xPosition, rowNumber++); // Volume up
+		CreateButton(mVolumeDwColliderStrip,	mVolumeDwButtonStrip,	sf::Color::Yellow,	xPosition, rowNumber++); // Volume down
+		CreateButton(mPitchUpColliderStrip,		mPitchUpButtonStrip,	sf::Color::Cyan,	xPosition, rowNumber++); // Pitch up
+		CreateButton(mPitchDwColliderStrip,		mPitchDwButtonStrip,	sf::Color::Cyan,	xPosition, rowNumber++); // Pitch down
+		CreateButton(mMoveRightColliderStrip,	mMoveRightButtonStrip,	sf::Color::Magenta, xPosition, rowNumber++); // Position - Move Right
+		CreateButton(mMoveLeftColliderStrip,	mMoveLeftButtonStrip,	sf::Color::Magenta, xPosition, rowNumber);	 // Position - Move Left
 
 		// Font               
 		auto text = std::make_shared<sf::Text>();
 		text->setString(soundDescription.mSoundName);
 		text->setCharacterSize(18);
-		text->setPosition(xPosition, mDeltaX);
+		text->setPosition(xPosition, sButtonDelta);
 		text->setFillColor(sf::Color::Black);
 		text->setFont(mFont);
 		mTextStrip.push_back(text);
 
-        xPosition += mRectSize + mDeltaX;
+        xPosition += mButtonSize + sButtonDelta;
     }
 }
 
-void UserInterface::onClick(const sf::Vector2i& mousePosition)
+void UserInterface::onClick(const sf::Vector2i& mousePosition) const
 {
-    // Play
-    int idx = 0;
-    for (const auto& collider : mPlayColliderStrip)
-    {
-        if (collider->contains(mousePosition))
-        {
-            mAudioManager.PlaySound(mSoundDescriptions[idx].mSoundName, {0, 0, 0}, 0.0, 1000.0);
-            return;
-        }
-        ++idx;
-    }
-
-    // Stop
-    idx = 0;
-    for (const auto& collider : mStopColliderStrip)
-    {
-        if (collider->contains(mousePosition))
-        {
-            mAudioManager.StopSound(mSoundDescriptions[idx].mSoundName, 1000.0); // FadeOut in milliseconds
-            return;
-        }
-        ++idx;
-    }
-
-	// Pause
-	idx = 0;
-	for (const auto& collider : mPauseColliderStrip)
+	// Global Engine controls
 	{
-		if (collider->contains(mousePosition))
-		{
-			mAudioManager.PauseSound(mSoundDescriptions[idx].mSoundName, 1000.0);  // FadeOut in milliseconds
-			return;
-		}
-		++idx;
+
 	}
 
-    // Volume up
-    idx = 0;
-    for (const auto& collider : mVolumeUpColliderStrip)
-    {
-        if (collider->contains(mousePosition))
-        {
-            mAudioManager.SetSoundVolume(mSoundDescriptions[idx].mSoundName, 25, true); // Add 25% to the current volume
-            return;
-        }
-        ++idx;
-    }
-
-    // Volume down
-    idx = 0;
-    for (const auto& collider : mVolumeDwColliderStrip)
-    {
-        if (collider->contains(mousePosition))
-        {
-            mAudioManager.SetSoundVolume(mSoundDescriptions[idx].mSoundName, -25, true); // Subtract 25% to the current volume
-            return;
-        }
-        ++idx;
-    }
-
-    // Pitch up
-    idx = 0;
-    for (const auto& collider : mPitchUpColliderStrip)
-    {
-        if (collider->contains(mousePosition))
-        {
-            mAudioManager.SetSoundPitch(mSoundDescriptions[idx].mSoundName, 0.1, true); // Raise the pitch by 0.1
-            return;
-        }
-        ++idx;
-    }
-
-    // Pitch down
-    idx = 0;
-    for (const auto& collider : mPitchDwColliderStrip)
-    {
-        if (collider->contains(mousePosition))
-        {
-            mAudioManager.SetSoundPitch(mSoundDescriptions[idx].mSoundName, -0.1, true); // Lower the pitch by 0.1
-            return;
-        }
-        ++idx;
-    }
-
-	// Position - Move Left
-	idx = 0;
-	for (const auto& collider : mMoveLeftColliderStrip)
+	// Sound specific controls
 	{
-		if (collider->contains(mousePosition))
+		// Play
+		int idx = 0;
+		for (const auto& collider : mPlayColliderStrip)
 		{
-			mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { 1.0, 0.0, 0.0 }, true); // Move left by 1
-			return;
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.PlaySound(mSoundDescriptions[idx].mSoundName, { 0, 0, 0 }, 0.0, 1000.0);
+				return;
+			}
+			++idx;
 		}
-		++idx;
-	}
 
-	// Position - Move Right
-	idx = 0;
-	for (const auto& collider : mMoveRightColliderStrip)
-	{
-		if (collider->contains(mousePosition))
+		// Stop
+		idx = 0;
+		for (const auto& collider : mStopColliderStrip)
 		{
-			mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { -1.0, 0.0, 0.0 }, true); // Move right by 1
-			return;
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.StopSound(mSoundDescriptions[idx].mSoundName, 1000.0); // FadeOut in milliseconds
+				return;
+			}
+			++idx;
 		}
-		++idx;
+
+		// Pause
+		idx = 0;
+		for (const auto& collider : mPauseColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.PauseSound(mSoundDescriptions[idx].mSoundName, 1000.0);  // FadeOut in milliseconds
+				return;
+			}
+			++idx;
+		}
+
+		// Volume up
+		idx = 0;
+		for (const auto& collider : mVolumeUpColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.SetSoundVolume(mSoundDescriptions[idx].mSoundName, 25, true); // Add 25% to the current volume
+				return;
+			}
+			++idx;
+		}
+
+		// Volume down
+		idx = 0;
+		for (const auto& collider : mVolumeDwColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.SetSoundVolume(mSoundDescriptions[idx].mSoundName, -25, true); // Subtract 25% to the current volume
+				return;
+			}
+			++idx;
+		}
+
+		// Pitch up
+		idx = 0;
+		for (const auto& collider : mPitchUpColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.SetSoundPitch(mSoundDescriptions[idx].mSoundName, 0.1, true); // Raise the pitch by 0.1
+				return;
+			}
+			++idx;
+		}
+
+		// Pitch down
+		idx = 0;
+		for (const auto& collider : mPitchDwColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.SetSoundPitch(mSoundDescriptions[idx].mSoundName, -0.1, true); // Lower the pitch by 0.1
+				return;
+			}
+			++idx;
+		}
+
+		// Position - Move Left
+		idx = 0;
+		for (const auto& collider : mMoveLeftColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { 1.0, 0.0, 0.0 }, true); // Move left by 1
+				return;
+			}
+			++idx;
+		}
+
+		// Position - Move Right
+		idx = 0;
+		for (const auto& collider : mMoveRightColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.SetSoundPosition(mSoundDescriptions[idx].mSoundName, { -1.0, 0.0, 0.0 }, true); // Move right by 1
+				return;
+			}
+			++idx;
+		}
 	}
 }
 
-void UserInterface::draw()
+void UserInterface::draw() const
 {
     for (const auto& button : mPlayButtonStrip)
         mParent.draw(*button);
@@ -201,4 +224,14 @@ void UserInterface::draw()
 
     for (const auto& text : mTextStrip)
         mParent.draw(*text);
+}
+
+unsigned int UserInterface::GetUiWidth() const
+{
+	return static_cast<unsigned int>(sButtonDelta + (sButtonDelta + mButtonSize) * mSoundDescriptions.size());
+}
+
+unsigned int UserInterface::GetUiHeight() const
+{
+	return static_cast<unsigned int>(sButtonDelta + (sButtonDelta + mButtonSize) * mControlsNumber);
 }

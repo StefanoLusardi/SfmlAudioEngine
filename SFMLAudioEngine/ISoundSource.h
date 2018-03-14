@@ -19,8 +19,8 @@ public:
     virtual double GetVolume() = 0;
 	virtual AudioUtils::Vector3d GetPosition() { return AudioUtils::Vector3d(); }
 	
+	virtual bool IsMono() = 0;
 	virtual bool IsSourcePlaying() = 0;
-
 
 protected:
     ISoundSource() { }

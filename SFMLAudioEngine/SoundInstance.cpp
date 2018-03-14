@@ -44,8 +44,8 @@ bool SoundInstance::GetStopRequest() const
 
 void SoundInstance::StartFade(const double fadeoutMilliseconds, const double targetVolume = 0)
 {
-	mFader = std::make_unique<AudioFader>(mVolume, targetVolume, fadeoutMilliseconds);
-    //mFader->Reset(mVolume, targetVolume, fadeoutMilliseconds);
+	mFader = std::make_unique<AudioFader>(Normalize(mSoundSource->GetVolume()), targetVolume, fadeoutMilliseconds);
+	//mFader = std::make_unique<AudioFader>(mVolume, targetVolume, fadeoutMilliseconds);
 }
 
 const SoundInstance::SoundState SoundInstance::GetState() const
@@ -58,7 +58,7 @@ const std::string SoundInstance::GetName() const
     return mSoundDescription.mSoundName;
 }
 
-void SoundInstance::SetVolume(const double volume, const bool isIncremental) const
+void SoundInstance::SetVolume(const double volume, const bool isIncremental)
 {
     // If isIncremental == true, then volume is an absolute value, 
     // otherwise it's a delta to be applied to the current volume.
@@ -77,6 +77,7 @@ void SoundInstance::SetVolume(const double volume, const bool isIncremental) con
     if (newVolume > 100.0) newVolume = 100.0;
     if (newVolume <   0.0) newVolume = 0.0;
 
+	//mVolume = newVolume/100.0f;
     mSoundSource->SetVolume(newVolume);
 }
 
@@ -95,10 +96,11 @@ void SoundInstance::SetPitch(const double pitch, const bool isIncremental) const
 
     if (newPitch <= 0.001) newPitch = 0.001;
 
+	//mPitch = newPitch;
     mSoundSource->SetPitch(newPitch);
 }
 
-void SoundInstance::SetPosition(const Vector3d& position, const bool isIncremental) const
+void SoundInstance::SetPosition(const Vector3d& position, const bool isIncremental)
 {
 	if (!isIncremental)
 	{
@@ -110,7 +112,10 @@ void SoundInstance::SetPosition(const Vector3d& position, const bool isIncrement
 	auto newPosition = mSoundSource->GetPosition();
 	newPosition += position;
 
-	mSoundSource->SetPosition(newPosition);
+	// Set instance position
+	mPosition = newPosition;
+	// Set source position
+	mSoundSource->SetPosition(mPosition);
 }
 
 void SoundInstance::Play() const
@@ -215,9 +220,8 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 			// Fade In still in progress --> Update source volume and fader value.
 			if (mFader && !mFader->IsFinished())
 			{
-				// Setter here, please!
 				mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
-				mVolume = mFader->GetValue();
+				//mVolume = mFader->GetValue();
 				mFader->Update(updateTime.count());
 			}
 
@@ -247,9 +251,8 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 
 			// Fade Out still in progress --> Update source volume and fader value.
 			{
-				// Setter here, please!
 				mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
-				mVolume = mFader->GetValue();
+				//mVolume = mFader->GetValue();
 				mFader->Update(updateTime.count());
 				return;
 			}
@@ -295,9 +298,8 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 
 			// Fade Out still in progress --> Update source volume and fader value.
 			{
-				// Setter here, please!
 				mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
-				mVolume = mFader->GetValue();
+				//mVolume = mFader->GetValue();
 				mFader->Update(updateTime.count());
 				return;
 			}

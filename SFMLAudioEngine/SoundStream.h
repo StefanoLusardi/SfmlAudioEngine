@@ -25,17 +25,22 @@ public:
     double GetVolume() override { return mMusic->getVolume(); }
 
 	bool IsSourcePlaying() override { return mMusic->getStatus(); }
+	bool IsMono() override { return mMusic->getChannelCount() == 1; }
 
 private:
     SoundStream(const SoundDescription soundDescription)
     {
         mMusic = std::make_unique<sf::Music>();
         mMusic->openFromFile("../AudioSamples/" + soundDescription.mSoundName + ".wav");
-        //mMusic->setPlayingOffset(sf::seconds(0));
-		mMusic->setAttenuation(DistanceToAttenuation(soundDescription.mMaxDistance, soundDescription.mMinDistance));
-		mMusic->setMinDistance(soundDescription.mMinDistance);
+
+		if (soundDescription.mIs3d && SoundStream::IsMono())
+		{
+			mMusic->setAttenuation(DistanceToAttenuation(soundDescription.mMaxDistance, soundDescription.mMinDistance));
+			mMusic->setMinDistance(soundDescription.mMinDistance);
+		}
+
 		mMusic->setLoop(soundDescription.mIsLoop);
-		//mMusic->setPitch(soundDescription.mDefaultPitch);
+		mMusic->setPitch(soundDescription.mDefaultPitch);
 		mMusic->setVolume(soundDescription.mDefaultVolume);
 	}	
 
