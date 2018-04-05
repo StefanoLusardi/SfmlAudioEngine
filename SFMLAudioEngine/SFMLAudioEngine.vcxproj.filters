@@ -77,5 +77,11 @@
     <ClInclude Include="Mock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NodeBasedTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PolicyBasedQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

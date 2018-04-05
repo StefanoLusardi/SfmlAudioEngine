@@ -4,10 +4,13 @@
 struct SoundDescription
 {
     enum class SoundType {SFX, STREAM, OSC};
-    
+    enum class Stealing {Oldest};
+
     SoundDescription(
         const std::string soundName,
         const SoundType   soundType,
+		const Stealing    instanceStealing,
+		const std::string mixerGroup,
         const double      defaultVolume = 1.0,
 		const double      defaultPitch = 1.0,
         const double      minDistance = 1.0,
@@ -16,6 +19,8 @@ struct SoundDescription
         const bool        is3d = false)
             : mSoundName(soundName)
             , mSoundType(soundType)
+			, mInstanceStealing{ instanceStealing }
+			, mMixerGroup{ mixerGroup }
             , mDefaultVolume{ defaultVolume }
 			, mDefaultPitch{ defaultPitch }
             , mMinDistance{ minDistance }
@@ -38,6 +43,8 @@ struct SoundDescription
 
     const std::string mSoundName;
     const SoundType mSoundType;
+	const Stealing mInstanceStealing;
+	const std::string mMixerGroup;
     double mDefaultVolume;
 	double mDefaultPitch;
     double mMinDistance;
