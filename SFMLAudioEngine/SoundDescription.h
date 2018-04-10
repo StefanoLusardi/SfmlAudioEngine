@@ -4,22 +4,20 @@
 struct SoundDescription
 {
     enum class SoundType {SFX, STREAM, OSC};
-    enum class Stealing {Oldest};
+	enum class StealingPolicy { OLDEST, NONE, VOLUME, DISTANCE };
 
     SoundDescription(
-        const std::string soundName,
-        const SoundType   soundType,
-		const Stealing    instanceStealing,
-		const std::string mixerGroup,
-        const double      defaultVolume = 1.0,
-		const double      defaultPitch = 1.0,
-        const double      minDistance = 1.0,
-        const double      maxDistance = 500.0,
-        const bool        isLoop = false,
-        const bool        is3d = false)
-            : mSoundName(soundName)
-            , mSoundType(soundType)
-			, mInstanceStealing{ instanceStealing }
+		const std::string&   soundName,
+        const SoundType      soundType,
+		const std::string&   mixerGroup,
+        const double         defaultVolume = 1.0,
+		const double         defaultPitch = 1.0,
+        const double         minDistance = 1.0,
+        const double         maxDistance = 500.0,
+        const bool           isLoop = false,
+        const bool           is3d = false)
+			: mSoundName{ soundName }
+			, mSoundType{ soundType }
 			, mMixerGroup{ mixerGroup }
             , mDefaultVolume{ defaultVolume }
 			, mDefaultPitch{ defaultPitch }
@@ -29,7 +27,11 @@ struct SoundDescription
             , mIs3d{ is3d }
     { }
 
-    ~SoundDescription() { }
+	~SoundDescription() = default;
+	SoundDescription(const SoundDescription& other) = default;
+	SoundDescription(SoundDescription&& other) noexcept = default;
+	SoundDescription& operator=(const SoundDescription& other) = default;
+	SoundDescription& operator=(SoundDescription&& other) noexcept = default;
 
     bool operator==(const SoundDescription& rhs) const
     {
@@ -43,12 +45,11 @@ struct SoundDescription
 
     const std::string mSoundName;
     const SoundType mSoundType;
-	const Stealing mInstanceStealing;
 	const std::string mMixerGroup;
-    double mDefaultVolume;
-	double mDefaultPitch;
-    double mMinDistance;
-    double mMaxDistance;
-    bool  mIsLoop;
-    bool  mIs3d;
+    const double mDefaultVolume;
+	const double mDefaultPitch;
+    const double mMinDistance;
+    const double mMaxDistance;
+    const bool  mIsLoop;
+    const bool  mIs3d;
 };

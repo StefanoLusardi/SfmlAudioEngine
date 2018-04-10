@@ -11,25 +11,11 @@
 class SoundFactory
 {
 public:
-    //static std::unique_ptr<ISoundSource> Create(const SoundDescription::SoundType soundType, const std::string soundPath)
-    //{
-    //    const auto ctor = mCreator.find(soundType);
-    //    if (ctor != mCreator.end())
-    //        return ctor->second(soundPath);
 
-    //    return nullptr;
-    //}
+	SoundFactory() = delete;
+	~SoundFactory() = default;
 
-    //static void Initialize()
-    //{
-    //    // std::make_unique<>() function won't work here beacause it's not a member function of this class and so it can't be frien of the 3 created classes
-    //    // See https://stackoverflow.com/questions/29896268/friend-function-is-unable-to-construct-a-unique-pointer-of-the-class
-    //    mCreator[SoundDescription::SoundType::SFX]    = [](const std::string soundPath) {return std::unique_ptr<SoundEffect>(new SoundEffect(soundPath)); };
-    //    mCreator[SoundDescription::SoundType::STREAM] = [](const std::string soundPath) {return std::unique_ptr<SoundStream>(new SoundStream(soundPath)); };
-    //    mCreator[SoundDescription::SoundType::OSC]    = [](const std::string soundPath) {return std::unique_ptr<Oscillator>(new Oscillator()); };
-    //}
-
-    static std::unique_ptr<ISoundSource> Create(const SoundDescription soundDescription)
+    static std::unique_ptr<ISoundSource> Create(const SoundDescription& soundDescription)
     {
         const auto ctor = mCreator.find(soundDescription.mSoundType);
         if (ctor != mCreator.end())
@@ -42,17 +28,12 @@ public:
     {
         // std::make_unique<>() function won't work here beacause it's not a member function of this class and so it can't be frien of the 3 created classes
         // See https://stackoverflow.com/questions/29896268/friend-function-is-unable-to-construct-a-unique-pointer-of-the-class
-        mCreator[SoundDescription::SoundType::STREAM] = [](const SoundDescription soundDescription) {return std::unique_ptr<SoundStream>(new SoundStream(soundDescription)); };
-        mCreator[SoundDescription::SoundType::SFX]    = [](const SoundDescription soundDescription) {return std::unique_ptr<SoundEffect>(new SoundEffect(soundDescription)); };
-        mCreator[SoundDescription::SoundType::OSC]    = [](const SoundDescription soundDescription) {return std::unique_ptr<Oscillator> (new Oscillator (soundDescription)); };
+        mCreator[SoundDescription::SoundType::STREAM] = [](const SoundDescription& soundDescription) {return std::unique_ptr<SoundStream>(new SoundStream(soundDescription)); };
+        mCreator[SoundDescription::SoundType::SFX]    = [](const SoundDescription& soundDescription) {return std::unique_ptr<SoundEffect>(new SoundEffect(soundDescription)); };
+        mCreator[SoundDescription::SoundType::OSC]    = [](const SoundDescription& soundDescription) {return std::unique_ptr<Oscillator> (new Oscillator (soundDescription)); };
     }
 
-    ~SoundFactory()
-    { }
-
 private:
-    SoundFactory()
-    { }
 
-    static std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(const SoundDescription)>> mCreator;
+    static std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(const SoundDescription&)>> mCreator;
 };

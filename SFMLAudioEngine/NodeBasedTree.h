@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 #include <iterator>
+#include <any>
 
 using GroupId = std::string;
 
@@ -50,6 +51,7 @@ private:
 };
 
 class Mixer;
+struct GroupProperty;
 class Group : public Node
 {
 	friend Mixer;
@@ -87,8 +89,20 @@ public:
 
 private:
 	double mVolume;
+
+	std::vector<GroupProperty> mGroupProperty; // ???
+
 	explicit Group(const std::string& name, const std::vector<std::shared_ptr<Node>> children = {})
 		: Node{ name, children }, mVolume{1.0} { }
+};
+
+struct GroupProperty
+{
+	GroupProperty(const std::string& name, const std::any& value)
+	: mName{ name }, mValue{value} { }
+
+	std::string mName;
+	std::any mValue;
 };
 
 class Snapshot final
@@ -108,12 +122,14 @@ public:
 			return;
 
 		std::transform(groupNames.begin(), groupNames.end(), groupVolumes.begin(),
-			std::inserter(mSnapshotMappings, mSnapshotMappings.end()), std::make_pair<const GroupId&, const double&>);
+			std::inserter(mSnapshotMappings, mSnapshotMappings.end()), 
+			std::make_pair<const GroupId&, const double&>);
 	}
 
 private:
 	const std::string mName;
 	std::map<GroupId, double> mSnapshotMappings;
+	//std::map<GroupId, std::vector<GroupProperty>> mSnapshotMappings;
 };
 
 class Mixer final
@@ -124,11 +140,7 @@ public:
 	void ApplySnapshot() const
 	{
 		for (const auto&[groupName, groupVolume] : mSnapshot->GetSnapshotMappings())
-		{
-			std::cout << "\n";
-			std::cout << "groupName: " << groupName << "\n";
-			std::cout << "groupVolume: " << groupVolume << "\n";
-			
+		{			
 			if (const auto group = mMasterGroup->GetChild(groupName); group != nullptr)
 				std::dynamic_pointer_cast<Group>(group)->SetVolume(groupVolume);
 		}

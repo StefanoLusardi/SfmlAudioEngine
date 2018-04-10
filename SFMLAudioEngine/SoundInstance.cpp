@@ -2,17 +2,16 @@
 #include "SoundFactory.h"
 #include "AudioEngine.h"
 #include <cassert>
-#include <iostream>
 
 // Initialize SoundFactory static map of SoundSource constructors
-std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(const SoundDescription)>> SoundFactory::mCreator = {};
+std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource>(const SoundDescription&)>> SoundFactory::mCreator = {};
 
 SoundInstance::SoundInstance(AudioEngine& engine
     , const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator sound
     , const Vector3d& position
     , const double volume)
       : mEngine{engine}
-      , mSoundDescription{sound->first}
+	  , mSoundDescription{ sound->first }
       , mSoundSource{sound->second}
 	  , mFader{nullptr}
       , mState{SoundState::INITIALIZE}
@@ -21,6 +20,7 @@ SoundInstance::SoundInstance(AudioEngine& engine
       , mStopRequest{false}
 	  , mPauseRequest{false}
 {
+	//SoundDescription pmSoundDescription(std::forward<SoundDescription>(std::move(sound->first)));
 }
 
 SoundInstance::~SoundInstance()
@@ -45,7 +45,6 @@ bool SoundInstance::GetStopRequest() const
 void SoundInstance::StartFade(const double fadeoutMilliseconds, const double targetVolume = 0)
 {
 	mFader = std::make_unique<AudioFader>(Normalize(mSoundSource->GetVolume()), targetVolume, fadeoutMilliseconds);
-	//mFader = std::make_unique<AudioFader>(mVolume, targetVolume, fadeoutMilliseconds);
 }
 
 const SoundInstance::SoundState SoundInstance::GetState() const
@@ -53,12 +52,17 @@ const SoundInstance::SoundState SoundInstance::GetState() const
     return mState;
 }
 
-const std::string SoundInstance::GetName() const
+const std::string& SoundInstance::GetName() const
 {
     return mSoundDescription.mSoundName;
 }
 
-void SoundInstance::SetVolume(const double volume, const bool isIncremental)
+const SoundDescription & SoundInstance::GetSoundDescription() const
+{
+	return mSoundDescription;
+}
+
+void SoundInstance::SetVolume(const double volume, const bool isIncremental) const
 {
     // If isIncremental == true, then volume is an absolute value, 
     // otherwise it's a delta to be applied to the current volume.
@@ -144,8 +148,7 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
     // Update instance Finite State Machine logic
     switch(mState)
     {
-        // The fallthrough attribute requires C++17
-        case SoundState::INITIALIZE: //[[fallthrough]];
+        case SoundState::INITIALIZE: [[fallthrough]];
         case SoundState::TOPLAY:
         {			
             if (mStopRequest)

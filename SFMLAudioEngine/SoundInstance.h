@@ -35,9 +35,10 @@ public:
     void SetStopRequest(const bool stopRequest);
 
     const SoundState GetState() const;
-    const std::string GetName() const;
+	const std::string& GetName() const;
+	const SoundDescription& GetSoundDescription() const;
 
-    void SetVolume(const double volume, const bool isIncremental);
+    void SetVolume(const double volume, const bool isIncremental) const;
     void SetPitch(const double pitch, const bool isIncremental) const;
 	void SetPosition(const Vector3d& position, const bool isIncremental);
 

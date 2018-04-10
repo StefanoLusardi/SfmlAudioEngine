@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Audio/SoundSource.hpp>
 
+#pragma warning( disable : 4244) 
+
 class ISoundSource : public sf::SoundSource
 {
 public:
@@ -13,7 +15,7 @@ public:
     virtual void SetLoop(const bool isLoop)     = 0;
     virtual void SetPitch(const double pitch)   = 0;
     virtual void SetVolume(const double volume) = 0;
-    virtual void SetPosition(const AudioUtils::Vector3d position){}
+    virtual void SetPosition(const AudioUtils::Vector3d& position){}
 
     virtual double GetPitch()  = 0;
     virtual double GetVolume() = 0;

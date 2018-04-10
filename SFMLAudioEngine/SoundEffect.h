@@ -22,7 +22,7 @@ public:
     void SetVolume(const double volume) override { mSound.setVolume(volume); }
 	
 	// Spatialization works only for mono sounds
-	void SetPosition(const AudioUtils::Vector3d position) override { mSound.setPosition(position.x, position.y, position.z); }
+	void SetPosition(const AudioUtils::Vector3d& position) override { mSound.setPosition(position.x, position.y, position.z); }
 	AudioUtils::Vector3d GetPosition() override { return AudioUtils::Vector3d(mSound.getPosition()); }
 
     double GetPitch() override { return mSound.getPitch(); }
@@ -32,7 +32,7 @@ public:
 	bool IsMono() override { return mSound.getBuffer()->getChannelCount() == 1; }
 
 private:
-    SoundEffect(const SoundDescription soundDescription)
+    SoundEffect(const SoundDescription& soundDescription)
     {
         mBuffer.loadFromFile("../AudioSamples/" + soundDescription.mSoundName + ".wav");
         mSound.setBuffer(mBuffer);

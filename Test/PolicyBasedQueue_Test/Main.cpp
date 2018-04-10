@@ -1,29 +1,38 @@
 #include "../../SFMLAudioEngine/PolicyBasedQueue.h"
 #include <iostream>
 #include <vector>
+#include <memory>
 
 int main()
 {
-	PolicyBasedQueue<std::list<std::string>, Policy::DiscardFirst> q{2};
+	auto q = std::make_unique<PolicyBasedQueue<std::list<std::string>>>(2);
+	q->SetPolicy(std::make_unique<Policy::DiscardFirst<std::list<std::string>>>());
 
-	std::cout << "Max Size: " << q.GetMaxSize() << std::endl;
-	std::cout << "Queue Size: " << q.GetQueueSize() << std::endl;
+	std::cout << "\nMax Size: " << q->GetMaxSize() << std::endl;
+	std::cout << "\nQueue Size: " << q->GetQueueSize() << std::endl;
 
-	q.Push("first");
-	std::cout << "Queue Size: " << q.GetQueueSize() << std::endl;
+	// Element discarded from the queue
+	std::string out;
 
-	q.Push("second");
-	std::cout << "Queue Size: " << q.GetQueueSize() << std::endl;
+	const auto p1 = q->Push("first", out);
+	std::cout << "\nQueue Size: " << q->GetQueueSize() << std::endl;
+	for (const auto& elem : q->GetContainer()) { std::cout << elem.c_str() << "\n"; }
+
+	const auto p2 = q->Push("second", out);
+	std::cout << "\nQueue Size: " << q->GetQueueSize() << std::endl;
+	for (const auto& elem : q->GetContainer()) { std::cout << elem.c_str() << "\n"; }
 	
-	q.Push("third");
-	std::cout << "Queue Size: " << q.GetQueueSize() << std::endl;
+	const auto p3 = q->Push("third", out);
+	std::cout << "\nQueue Size: " << q->GetQueueSize() << std::endl;
+	for (const auto& elem : q->GetContainer()) { std::cout << elem.c_str() << "\n"; }
 
-	auto c = q.GetContainer().front();
-	q.Pop(c);
-	std::cout << "Queue Size: " << q.GetQueueSize() << std::endl;
-	
-	//q.Pop("fourth");
-	//std::cout << "Queue Size: " << q.GetQueueSize() << std::endl;
+	auto c = q->GetContainer().front();
+	q->Pop(c);
+	std::cout << "\nQueue Size: " << q->GetQueueSize() << std::endl;
+	for (const auto& elem : q->GetContainer()) { std::cout << elem.c_str() << "\n"; }
+
+	//q->Pop("fourth");
+	//std::cout << "Queue Size: " << q->GetQueueSize() << std::endl;
 
 	return 0;
 }

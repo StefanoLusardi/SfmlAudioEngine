@@ -108,7 +108,7 @@ public:
     void SetLoop(const bool /*isLoop*/) override { /* Oscillators are always looping by definition */ }
     void SetPitch(const double pitch) override   { mOscillator->setPitch(pitch); }
     void SetVolume(const double volume) override { mOscillator->setVolume(volume); }
-	void SetPosition(const AudioUtils::Vector3d position) override { mOscillator->setPosition(position.x, position.y, position.z); }
+	void SetPosition(const AudioUtils::Vector3d& position) override { mOscillator->setPosition(position.x, position.y, position.z); }
 	
     double GetPitch() override { return mOscillator->getPitch(); }
     double GetVolume() override { return mOscillator->getVolume(); }
@@ -118,7 +118,7 @@ public:
 	bool IsMono() override { return true; }
 
 private:
-    Oscillator(const SoundDescription soundDescription) 
+    Oscillator(const SoundDescription& soundDescription) 
     : mOscillator { std::make_unique<StreamOscillator>() }
     {
         Oscillator::SetLoop(soundDescription.mIsLoop);

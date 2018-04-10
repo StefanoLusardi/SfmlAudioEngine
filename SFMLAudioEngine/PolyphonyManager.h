@@ -1,27 +1,73 @@
 #pragma once
 
+#include "PolicyBasedQueue.h"
+#include "SoundDescription.h"
+
+#include <functional>
+#include <queue>
+
+using GroupId = std::string;
+using InstanceList = std::list<int>;
+using Stealing = SoundDescription::StealingPolicy;
+
 class PolyphonyManager
 {
 public:
-    enum class VirtualVoiceSettings {OLDEST, VOLUME, DISTANCE};
+    explicit PolyphonyManager(const std::vector<std::tuple<const GroupId, const int, const Stealing>> groupSettings)
+    {
+		for (const auto&[groupId, groupMaxInstances, groupStealingPolicy] : groupSettings)
+		{
+			auto queue = std::make_unique<PolicyBasedQueue<InstanceList>>(groupMaxInstances);
 
-    explicit PolyphonyManager(const int maxInstance
-        , const int maxLoadedSound
-        , const VirtualVoiceSettings vistualVoiceSettings = VirtualVoiceSettings::OLDEST)
-    : mMaxInstances{ maxInstance }
-    , mMaxLoadedSounds{ maxLoadedSound }
-    , mVirtualizeSettings{ vistualVoiceSettings }
-    { }
+			switch (groupStealingPolicy)
+			{
+			case Stealing::NONE:
+				queue->SetPolicy(std::make_unique<Policy::DiscardNone<InstanceList>>());
+				break;
+			case Stealing::OLDEST:
+				queue->SetPolicy(std::make_unique<Policy::DiscardFirst<InstanceList>>());
+				break;
+				//case Stealing::VOLUME: 
+				//	queue->SetPolicy(std::make_unique<Policy::DiscardFirst<InstanceList>>());
+				//	break;
+				//case Stealing::DISTANCE: 
+				//	queue->SetPolicy(std::make_unique<Policy::DiscardFirst<InstanceList>>());
+				//	break;
+			default:
+				queue->SetPolicy(std::make_unique<Policy::DiscardFirst<InstanceList>>());;
+			}
 
-    ~PolyphonyManager()
-    { }
+			mInstanceQueue[groupId] = std::move(queue);
+		}
+    }
 
-    const int GetMaxInstances() const { return mMaxInstances; }
-    const int GetMaxLoadedSounds() const { return mMaxLoadedSounds; }
-    const VirtualVoiceSettings GetVirtualVoiceSettings() const { return mVirtualizeSettings; }
+	~PolyphonyManager() = default;
+
+	bool Push(const std::string& groupName, const int instanceId, int&& removedInstanceId)
+	{
+		if (auto group = FindGroupQueue(groupName); group != mInstanceQueue.end())
+		{
+			return group->second->Push(instanceId, removedInstanceId);
+		}
+
+		return false;
+	}
+
+	bool Pop(const std::string& groupName, int&& instanceIdOut = 0)
+	{
+		if (auto group = FindGroupQueue(groupName); group != mInstanceQueue.end())
+		{
+			return group->second->Pop(instanceIdOut);
+		}
+
+		return false;
+	}
 
 private:
-    const int mMaxInstances;
-    const int mMaxLoadedSounds;
-    VirtualVoiceSettings mVirtualizeSettings;
+	std::map<const GroupId, std::unique_ptr<PolicyBasedQueue<InstanceList>>> mInstanceQueue;
+
+	auto FindGroupQueue(const std::string& groupName) -> decltype(mInstanceQueue)::iterator
+	{
+		return std::find_if(mInstanceQueue.begin(), mInstanceQueue.end(), [&groupName](const auto& group) {return group.first == groupName; });
+	}
 };

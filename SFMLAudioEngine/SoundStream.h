@@ -28,7 +28,7 @@ public:
 	bool IsMono() override { return mMusic->getChannelCount() == 1; }
 
 private:
-    SoundStream(const SoundDescription soundDescription)
+    SoundStream(const SoundDescription& soundDescription)
     {
         mMusic = std::make_unique<sf::Music>();
         mMusic->openFromFile("../AudioSamples/" + soundDescription.mSoundName + ".wav");

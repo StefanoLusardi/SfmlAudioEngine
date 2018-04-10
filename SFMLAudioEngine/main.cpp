@@ -9,7 +9,7 @@ using namespace std::literals::chrono_literals;
 int main(int argc, char* argv[])
 {
     // Setup Polyphony Manager and instanciate Audio Engine which handles the Audio Engine
-    const PolyphonyManager polyphonyManager{32, 32};
+    PolyphonyManager polyphonyManager{Mock::GetGroupSettings()};
     AudioManager audioManager{polyphonyManager};
 
 	// This information should be provided in Json or XML format
