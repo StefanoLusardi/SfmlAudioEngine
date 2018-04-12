@@ -1,16 +1,21 @@
-#include <SFML/Graphics.hpp>
+#include "Mock.h"
 #include "AudioManager.h"
 #include "UserInterface.h"
-#include "Mock.h"
-#include <chrono>
 
+#include <chrono>
 using namespace std::literals::chrono_literals;
 
 int main(int argc, char* argv[])
 {
-    // Setup Polyphony Manager and instanciate Audio Engine which handles the Audio Engine
-    PolyphonyManager polyphonyManager{Mock::GetGroupSettings()};
-    AudioManager audioManager{polyphonyManager};
+    // Setup Polyphony Manager 
+    PolyphonyManager polyphonyManager { Mock::GetGroupSettings() };
+
+	// Setup Mixer and load its snapshots
+	Mixer mixer{ Mock::GetMasterGroup(), Mock::GetMixerGroups() };
+	mixer.LoadSnapshots(Mock::GetMixerSnapshots());
+
+	// Instanciate Audio Engine which handles the Audio Engine
+    AudioManager audioManager { mixer,  polyphonyManager };
 
 	// This information should be provided in Json or XML format
 	const auto soundDescriptions = Mock::GetSoundsDescriptions();
@@ -24,7 +29,7 @@ int main(int argc, char* argv[])
 
 	// Create a main window with a UI
 	sf::RenderWindow window(sf::VideoMode(), "SFML Audio Engine", sf::Style::Titlebar | sf::Style::Close);
-    UserInterface ui{window, audioManager, Mock::GetSoundsDescriptions() };
+    UserInterface ui { window, audioManager, Mock::GetSoundsDescriptions() };
 
 	// Shrink window size to fit available sounds and available features
 	window.setSize(sf::Vector2u{ ui.GetUiWidth(), ui.GetUiHeight() });
@@ -43,7 +48,7 @@ int main(int argc, char* argv[])
         start = std::chrono::system_clock::now();
 
         // Event Loop
-        sf::Event event;
+        sf::Event event{};
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::MouseButtonPressed)

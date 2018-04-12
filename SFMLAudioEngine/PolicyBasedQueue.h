@@ -18,8 +18,7 @@ namespace Policy
 	{
 		IPolicy() = default;
 		virtual ~IPolicy() = default;
-				
-		//virtual typename Container::value_type ApplyPolicy(Container& container) const = 0;
+
 		virtual bool ApplyPolicy(Container& container, typename Container::value_type&& discardedElem) const = 0;
 
 	};

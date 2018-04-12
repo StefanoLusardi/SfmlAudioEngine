@@ -2,17 +2,18 @@
 
 #include <memory>
 #include <map>
+#include <chrono>
 
 #include "Utils.h"
-#include "AudioFader.h"
-#include "ISoundSource.h"
 #include "SoundDescription.h"
-#include <chrono>
+#include "AudioFader.h"
 
 using SoundId = int;
 using namespace AudioUtils;
 
+class Group;
 class AudioEngine;
+class ISoundSource;
 
 class SoundInstance
 {
@@ -20,7 +21,7 @@ public:
     enum class SoundState {INITIALIZE, TOPLAY, PLAYING, STOPPING, STOPPED, PAUSING, PAUSED, LOADING };
 
     SoundInstance(AudioEngine& engine, const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator sound, const Vector3d& position, const double volume);
-    ~SoundInstance();
+    ~SoundInstance() = default;
 
     void Play() const;
     void Stop() const;
@@ -44,11 +45,15 @@ public:
 
 private:
     AudioEngine & mEngine;
-    SoundDescription mSoundDescription;
+
+    const SoundDescription mSoundDescription;
     const std::shared_ptr<ISoundSource> mSoundSource;
+	const std::shared_ptr<Group> mGroup;
     std::unique_ptr<AudioFader> mFader;
+
     SoundState mState;
     Vector3d mPosition;
+
     double mVolume;
 	bool mStopRequest;
 	bool mPauseRequest;

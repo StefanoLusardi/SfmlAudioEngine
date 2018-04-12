@@ -1,13 +1,6 @@
 #include "UserInterface.h"
 #include "AudioManager.h"
 
-auto GetUiWidth()
-{
-	
-}
-
-auto GetUiHeight(){}
-
 float UserInterface::sButtonDelta{ 5.0f };
 float UserInterface::mButtonSize{ 100.f };
 

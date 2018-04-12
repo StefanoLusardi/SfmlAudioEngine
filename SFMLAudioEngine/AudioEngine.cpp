@@ -5,8 +5,8 @@
 #include <chrono>
 #include <SFML/Audio/Listener.hpp>
 
-AudioEngine::AudioEngine(PolyphonyManager& polyphonyManager)
-: mNextInstanceId{ 1 }, mPolyphonyManager{ polyphonyManager }
+AudioEngine::AudioEngine(Mixer& mixer, PolyphonyManager& polyphonyManager)
+: mNextInstanceId{ 1 }, mMixer{ mixer }, mPolyphonyManager{ polyphonyManager }
 {
     SoundFactory::Initialize();
 	sf::Listener::setPosition(0.f, 0.f, 0.f);
@@ -16,29 +16,27 @@ AudioEngine::AudioEngine(PolyphonyManager& polyphonyManager)
 
 bool AudioEngine::IsLoaded(const std::string& soundName)
 {
-    return FindSound(soundName) != mSounds.end();
+	return FindSound(soundName) != mSounds.end();
 }
 
 bool AudioEngine::IsInstanciated(const std::string& soundName)
 {
-    return FindInstance(soundName) != mInstances.end();
+	return FindInstance(soundName) != mInstances.end();
 }
 
 /**
  * Helper function to retrieve a pair of mSounds map given a sound name
  */
-std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator 
-AudioEngine::FindSound(const std::string& soundName)
-{    
-    return std::find_if(mSounds.begin(), mSounds.end(),
+auto AudioEngine::FindSound(const std::string& soundName) -> decltype(mSounds)::iterator
+{
+	return std::find_if(mSounds.begin(), mSounds.end(),
         [&soundName](const auto& sound) {return soundName == sound.first.mSoundName; });
 }
 
 /**
 * Helper function to retrieve a pair of mInstances map given a sound name
 */
-std::map<const SoundId, std::unique_ptr<SoundInstance>>::iterator
-AudioEngine::FindInstance(const std::string& soundName)
+auto AudioEngine::FindInstance(const std::string& soundName) -> decltype(mInstances)::iterator
 {
     return std::find_if(mInstances.begin(), mInstances.end(),
         [&soundName](const auto& sound) {return soundName == sound.second->GetName(); });
@@ -116,14 +114,7 @@ void AudioEngine::Update(const std::chrono::duration<double, std::milli> updateT
 
     // Delete stopped instances
     for (auto& it : stoppedInstances)
-    {
 		mInstances.erase(it);
-		// NO!! Remove instanceId from Polyphony Manager
-		//if (mPolyphonyManager.Pop(it->second->GetSoundDescription().mMixerGroup))
-		//{
-		//	mInstances.erase(it);	    
-		//}
-    }
 }
 
 SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds)
@@ -135,8 +126,8 @@ SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& pos
 
 	// Resume a paused Sound Instance
 	const auto pausedInstance = FindInstance(soundName);
-	if (pausedInstance != mInstances.end() &&
-		pausedInstance->second->GetState() == SoundInstance::SoundState::PAUSED)
+	if (pausedInstance->second->GetState() == SoundInstance::SoundState::PAUSED && 
+		pausedInstance != mInstances.end())
 	{
 		pausedInstance->second->SetPauseRequest(false);
 
@@ -171,7 +162,6 @@ SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& pos
 
 void AudioEngine::StopSound(const std::string& soundName, const double fadeoutMilliseconds)
 {
-
     const auto sound = FindInstance(soundName);
     if (sound == mInstances.end())
         return;

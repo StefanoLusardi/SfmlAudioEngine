@@ -83,5 +83,14 @@
     <ClInclude Include="PolicyBasedQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Mixer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Snapshot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Group.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

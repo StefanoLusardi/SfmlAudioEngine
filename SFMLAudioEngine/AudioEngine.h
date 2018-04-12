@@ -1,16 +1,19 @@
 #pragma once
-#include <map>
+
+#include "Mixer.h"
 #include "SoundInstance.h"
 #include "SoundDescription.h"
-#include <vector>
 #include "PolyphonyManager.h"
+
+#include <map>
+#include <vector>
 #include <chrono>
 
 class AudioEngine
 {
 public:
-    explicit AudioEngine(PolyphonyManager& polyphonyManager);
-    ~AudioEngine() = default;
+    explicit AudioEngine(Mixer& mixer, PolyphonyManager& polyphonyManager);
+	~AudioEngine() = default;
 	AudioEngine(const AudioEngine& other) = delete;
 	AudioEngine(AudioEngine&& other) = delete;
 	AudioEngine& operator=(const AudioEngine& other) = delete;
@@ -33,8 +36,8 @@ public:
 
     bool IsLoaded(const std::string& soundName);
     bool IsInstanciated(const std::string& soundName);
-	std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator FindSound(const std::string& soundName);
-	std::map<const SoundId, std::unique_ptr<SoundInstance>>::iterator FindInstance(const std::string& soundName);
+	auto FindSound(const std::string& soundName) -> std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator;
+	auto FindInstance(const std::string& soundName) -> std::map<const SoundId, std::unique_ptr<SoundInstance>>::iterator;
 
     void SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental);
     void SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental);
@@ -48,12 +51,14 @@ public:
 	void SetListenerPosition(const Vector3d& vector3D) const;
 	void SetListenerDirection(const Vector3d& vector3D) const;
 	void SetListenerUpVector(const Vector3d& vUp) const;
+    
 
 private:
-    SoundId mNextInstanceId;
+	Mixer& mMixer;
 	PolyphonyManager& mPolyphonyManager;
 
+    SoundId mNextInstanceId;
+	std::map<const SoundId, std::unique_ptr<SoundInstance>> mInstances;
     std::map<const SoundDescription, std::shared_ptr<ISoundSource>> mSounds;
-    std::map<const SoundId, std::unique_ptr<SoundInstance>> mInstances;
 };
 

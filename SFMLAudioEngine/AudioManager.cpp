@@ -2,8 +2,8 @@
 #include <chrono>
 #include <chrono>
 
-AudioManager::AudioManager(PolyphonyManager& polyphonyManager)
-: mAudioEngine(new AudioEngine(polyphonyManager), [](AudioEngine *audioEngine) {delete audioEngine; })
+AudioManager::AudioManager(Mixer& mixer, PolyphonyManager& polyphonyManager)
+: mAudioEngine(new AudioEngine(mixer, polyphonyManager), [](AudioEngine *audioEngine) {delete audioEngine; })
 {
 }
 

@@ -146,12 +146,15 @@
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="AudioFader.h" />
     <ClInclude Include="AudioManager.h" />
+    <ClInclude Include="Group.h" />
     <ClInclude Include="ISoundSource.h" />
+    <ClInclude Include="Mixer.h" />
     <ClInclude Include="Mock.h" />
     <ClInclude Include="NodeBasedTree.h" />
     <ClInclude Include="Oscillator.h" />
     <ClInclude Include="PolicyBasedQueue.h" />
     <ClInclude Include="PolyphonyManager.h" />
+    <ClInclude Include="Snapshot.h" />
     <ClInclude Include="SoundDescription.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="SoundFactory.h" />

@@ -1,9 +1,13 @@
 #pragma once
 #include "SoundDescription.h"
-#include <vector>
+#include "NodeBasedTree.h"
 
-using Type	   = SoundDescription::SoundType;
-using Stealing = SoundDescription::StealingPolicy;
+#include <vector>
+#include <map>
+
+using Type	     = SoundDescription::SoundType;
+using Stealing   = SoundDescription::StealingPolicy;
+using GroupProps = double;
 
 namespace Mock
 {
@@ -42,7 +46,7 @@ namespace Mock
         };
     }
 
-	inline std::vector<std::tuple<const std::string, const int, const Stealing>> GetGroupSettings()
+	inline std::vector<std::tuple<const GroupId, const int, const Stealing>> GetGroupSettings()
 	{
 		return
 		{
@@ -56,8 +60,33 @@ namespace Mock
 	}
 
 	// Returns a stub of Mixer Groups structure defined by the user.
-	//inline const ??? GetMixerGroups()
+	inline std::vector<std::pair<GroupId, std::vector<GroupId>>> GetMixerGroups()
+	{
+		return 
+		{
+			// Parent Group,  Children Groups
+			{ "Menu",		 { "Music", "Ui"  } },
+			{ "Effects",	 { "Sfx",   "Osc" } },
+			{ "Voiceover",   { "Uke",   "Ita" } },
+			{ "Uke",		 { "Voices"		  } },
+		};
+	}
 
+	// Returns a stub of Mixer Groups structure defined by the user.
+	inline std::pair<GroupId, std::vector<GroupId>> GetMasterGroup()
+	{
+				// Master Group, Children Groups
+		return { "MasterGroup",  { "Drums", "Menu", "Effects", "Voiceover" } };
+	}
+	
 	// Returns a stub of Mixer Snapshots structure defined by the user.
-	//inline const ??? GetMixerSnapshots()
+	inline std::vector<std::pair<SnapshotId, std::map<GroupId, GroupProps>>> GetMixerSnapshots()
+	{
+		return 
+		{
+			{ "GameSnapshot",  { { "Menu", 0.0 },{ "Ui", 0.0 },{ "Music", 1.0 },{ "Voices", 0.0 }, { "Sfx", 1.0 } } },
+			{ "MenuSnapshot",  { { "Menu", 1.0 },{ "Ui", 1.0 },{ "Music", 1.0 },{ "Voices", 1.0 }, { "Sfx", 0.0 } } },
+			{ "PauseSnapshot", { { "Menu", 1.0 },{ "Ui", 1.0 },{ "Music", 1.0 },{ "Voices", 1.0 }, { "Sfx", 0.0 } } },
+		};
+	}
 }

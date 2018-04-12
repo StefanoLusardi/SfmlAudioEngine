@@ -1,8 +1,9 @@
 #pragma once
 
-#include <memory>
-#include <SFML/Graphics.hpp>
 #include "SoundDescription.h"
+#include <SFML/Graphics.hpp>
+
+#include <memory>
 
 class AudioManager;
 

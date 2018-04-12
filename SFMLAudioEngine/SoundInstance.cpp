@@ -1,6 +1,9 @@
 #include "SoundInstance.h"
 #include "SoundFactory.h"
 #include "AudioEngine.h"
+#include "AudioFader.h"
+#include "ISoundSource.h"
+
 #include <cassert>
 
 // Initialize SoundFactory static map of SoundSource constructors
@@ -19,11 +22,6 @@ SoundInstance::SoundInstance(AudioEngine& engine
       , mVolume{volume}
       , mStopRequest{false}
 	  , mPauseRequest{false}
-{
-	//SoundDescription pmSoundDescription(std::forward<SoundDescription>(std::move(sound->first)));
-}
-
-SoundInstance::~SoundInstance()
 {
 }
 
@@ -64,7 +62,7 @@ const SoundDescription & SoundInstance::GetSoundDescription() const
 
 void SoundInstance::SetVolume(const double volume, const bool isIncremental) const
 {
-    // If isIncremental == true, then volume is an absolute value, 
+    // If isIncremental == false, then volume is an absolute value, 
     // otherwise it's a delta to be applied to the current volume.
 
     if (!isIncremental)

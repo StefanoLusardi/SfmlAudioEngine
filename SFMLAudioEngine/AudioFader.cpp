@@ -5,10 +5,6 @@ AudioFader::AudioFader(const double initialVolume, const double targetVolume, co
     Reset(initialVolume, targetVolume, deltaTimeMilliseconds);
 }
 
-AudioFader::~AudioFader()
-{
-}
-
 void AudioFader::Reset(const double initialVolume, const double targetVolume, const double deltaTimeMilliseconds)
 {
 	mCurrentTime   = 0;

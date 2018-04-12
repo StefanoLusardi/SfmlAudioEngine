@@ -16,7 +16,7 @@ class PolyphonyManager;
 class AudioManager
 {
 public:
-    explicit AudioManager(PolyphonyManager& polyphonyManager);
+    explicit AudioManager(Mixer& mixer, PolyphonyManager& polyphonyManager);
 	~AudioManager() = default;
 	AudioManager(const AudioManager& other) = delete;
 	AudioManager(AudioManager&& other) = delete;
