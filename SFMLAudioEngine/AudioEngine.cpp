@@ -105,16 +105,25 @@ void AudioEngine::Update(const std::chrono::duration<double, std::milli> updateT
 {
     // Update instances at each game tick, then retrieve the stopped ones.
     std::vector<std::map<SoundId, std::unique_ptr<SoundInstance>>::iterator> stoppedInstances;
-    for (auto it = mInstances.begin(), itEnd = mInstances.end(); it != itEnd; ++it)
+    for (auto activeInstance = mInstances.begin(), endInstance = mInstances.end(); activeInstance != endInstance; ++activeInstance)
     {
-        it->second->Update(updateTime);
-        if (it->second->GetState() == SoundInstance::SoundState::STOPPED)
-            stoppedInstances.push_back(it);
+        activeInstance->second->Update(updateTime);
+        if (activeInstance->second->GetState() == SoundInstance::SoundState::STOPPED)
+            stoppedInstances.push_back(activeInstance);
     }
 
-    // Delete stopped instances
-    for (auto& it : stoppedInstances)
-		mInstances.erase(it);
+    for (auto& stoppedInstance : stoppedInstances)
+    {
+		// Remove the stopped instance from Polyphony Manager
+		mPolyphonyManager.Pop(stoppedInstance->second->GetSoundDescription().mMixerGroup);
+		
+    	// Unregister the stopped instance from its Groups
+		for (auto& token : stoppedInstance->second->GetTokens())
+			mMixer.GetGroup(stoppedInstance->second->GetSoundDescription().mMixerGroup)->UnregisterObserver(std::move(token));
+
+		// Delete the stopped instance
+		mInstances.erase(stoppedInstance);
+    }
 }
 
 SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds)
@@ -126,8 +135,8 @@ SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& pos
 
 	// Resume a paused Sound Instance
 	const auto pausedInstance = FindInstance(soundName);
-	if (pausedInstance->second->GetState() == SoundInstance::SoundState::PAUSED && 
-		pausedInstance != mInstances.end())
+	if (pausedInstance != mInstances.end() && 
+		pausedInstance->second->GetState() == SoundInstance::SoundState::PAUSED)
 	{
 		pausedInstance->second->SetPauseRequest(false);
 
@@ -143,8 +152,14 @@ SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& pos
 	{
 		mInstances[mNextInstanceId] = std::make_unique<SoundInstance>(*this, sound, position, volume);
 
+		// Subscribe the new instance as an Observer of its Mixer Group
+		auto token = mMixer.GetGroup(sound->first.mMixerGroup)->RegisterObserver(PropertyType::VOLUME,
+			std::bind(&SoundInstance::OnGroupUpdate, mInstances[mNextInstanceId].get(), std::placeholders::_1));
+
+		mInstances[mNextInstanceId]->SetToken(std::move(token));
+
 		if (fadeinMilliseconds > 0.0f)
-			mInstances[mNextInstanceId]->StartFade(fadeinMilliseconds, 1.0f);
+			mInstances[mNextInstanceId]->StartFade(fadeinMilliseconds, volume);
 
 		// If pushing a new instance in the Polyphony Manager an old instance is removed we need to stop it
 		if (removedInstanceId)
@@ -170,9 +185,6 @@ void AudioEngine::StopSound(const std::string& soundName, const double fadeoutMi
         sound->second->StartFade(fadeoutMilliseconds, 0.0f);
 
     sound->second->SetStopRequest(true);
-
-	// Remove stopped Sound Instance from Polyphony Manager
-	mPolyphonyManager.Pop(sound->second->GetSoundDescription().mMixerGroup);
 }
 
 void AudioEngine::PauseSound(const std::string& soundName, const double fadeoutMilliseconds)
@@ -250,4 +262,9 @@ void AudioEngine::SetListenerDirection(const Vector3d& vDirection) const
 void AudioEngine::SetListenerUpVector(const Vector3d& vUp) const
 {
 	sf::Listener::setUpVector(vUp.x, vUp.y, vUp.z);
+}
+
+void AudioEngine::SetGroupVolume(const std::string & groupName, const double volume)
+{
+	mMixer.GetGroup(groupName)->SetVolume(volume);
 }

@@ -50,6 +50,8 @@ public:
 	void SetListenerDirection(const Vector3d& vDirection) const;
 	void SetListenerUpVector(const Vector3d& vUp) const;
 
+	void SetGroupVolume(const std::string& groupName, const double volume) const;
+
 private:
     std::unique_ptr<AudioEngine, std::function<void(AudioEngine*)>> mAudioEngine;
 };

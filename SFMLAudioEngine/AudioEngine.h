@@ -51,7 +51,8 @@ public:
 	void SetListenerPosition(const Vector3d& vector3D) const;
 	void SetListenerDirection(const Vector3d& vector3D) const;
 	void SetListenerUpVector(const Vector3d& vUp) const;
-    
+	
+	void SetGroupVolume(const std::string& groupName, const double volume);
 
 private:
 	Mixer& mMixer;

@@ -42,10 +42,13 @@ bool SoundInstance::GetStopRequest() const
 
 void SoundInstance::StartFade(const double fadeoutMilliseconds, const double targetVolume = 0)
 {
-	mFader = std::make_unique<AudioFader>(Normalize(mSoundSource->GetVolume()), targetVolume, fadeoutMilliseconds);
+	if (mFader)
+		mFader->Reset(Normalize(mSoundSource->GetVolume()), targetVolume, fadeoutMilliseconds);
+	else
+		mFader = std::make_unique<AudioFader>(Normalize(mSoundSource->GetVolume()), targetVolume, fadeoutMilliseconds);
 }
 
-const SoundInstance::SoundState SoundInstance::GetState() const
+const SoundInstance::SoundState& SoundInstance::GetState() const
 {
     return mState;
 }
@@ -102,7 +105,7 @@ void SoundInstance::SetPitch(const double pitch, const bool isIncremental) const
     mSoundSource->SetPitch(newPitch);
 }
 
-void SoundInstance::SetPosition(const Vector3d& position, const bool isIncremental)
+void SoundInstance::SetPosition(const Vector3d& position, const bool isIncremental) const 
 {
 	if (!isIncremental)
 	{
@@ -115,9 +118,59 @@ void SoundInstance::SetPosition(const Vector3d& position, const bool isIncrement
 	newPosition += position;
 
 	// Set instance position
-	mPosition = newPosition;
+	//mPosition = newPosition;
 	// Set source position
 	mSoundSource->SetPosition(mPosition);
+}
+
+void SoundInstance::SetToken(Token&& token)
+{
+	mGroupSubscriptionTokens.push_back(std::forward<Token>(token));
+}
+
+std::vector<Token> SoundInstance::GetTokens() const
+{
+	return mGroupSubscriptionTokens;
+}
+
+/**
+* Event handler subscribed to the Group notifications
+*/
+void SoundInstance::OnGroupUpdate(const GroupProperty& groupProperty)
+{
+	const auto interpolationTime = 100.0; // [ms]
+
+	switch (groupProperty.mPropertyType)
+	{
+	case PropertyType::MUTE: 
+		std::get<bool>(groupProperty.mValue) ? StartFade(interpolationTime, 1.0) : StartFade(interpolationTime, 0.0);
+		break;
+
+	case PropertyType::VOLUME : 
+		StartFade(interpolationTime, std::get<double>(groupProperty.mValue));
+		break;
+
+	case PropertyType::PITCH : 
+		break;
+
+	default : 
+		break;
+	}
+}
+
+void SoundInstance::SetVolume(const double volume) const
+{
+	mSoundSource->SetVolume(volume);
+}
+
+void SoundInstance::SetPitch(const double pitch) const
+{
+	mSoundSource->SetPitch(pitch);
+}
+
+void SoundInstance::SetPosition(const Vector3d& position) const
+{
+	mSoundSource->SetPosition(position);
 }
 
 void SoundInstance::Play() const
@@ -222,7 +275,6 @@ void SoundInstance::Update(const std::chrono::duration<double, std::milli> updat
 			if (mFader && !mFader->IsFinished())
 			{
 				mSoundSource->SetVolume(mSoundSource->getVolume() * mFader->GetValue());
-				//mVolume = mFader->GetValue();
 				mFader->Update(updateTime.count());
 			}
 

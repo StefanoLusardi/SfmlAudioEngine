@@ -7,8 +7,10 @@
 #include "Utils.h"
 #include "SoundDescription.h"
 #include "AudioFader.h"
+#include "Group.h"
 
 using SoundId = int;
+using GroupId = std::string;
 using namespace AudioUtils;
 
 class Group;
@@ -35,20 +37,27 @@ public:
 	void SetPauseRequest(const bool pauseRequest);
     void SetStopRequest(const bool stopRequest);
 
-    const SoundState GetState() const;
+    const SoundState& GetState() const;
 	const std::string& GetName() const;
 	const SoundDescription& GetSoundDescription() const;
 
-    void SetVolume(const double volume, const bool isIncremental) const;
+	void SetVolume(const double volume) const;
+	void SetPitch(const double pitch) const;
+	void SetPosition(const Vector3d& position) const;
+
+	void SetVolume(const double volume, const bool isIncremental) const;
     void SetPitch(const double pitch, const bool isIncremental) const;
-	void SetPosition(const Vector3d& position, const bool isIncremental);
+	void SetPosition(const Vector3d& position, const bool isIncremental) const;
+
+	void SetToken(Token&& token);
+	std::vector<Token> GetTokens() const;
+	void OnGroupUpdate(const GroupProperty& groupProperty);
 
 private:
     AudioEngine & mEngine;
 
     const SoundDescription mSoundDescription;
     const std::shared_ptr<ISoundSource> mSoundSource;
-	const std::shared_ptr<Group> mGroup;
     std::unique_ptr<AudioFader> mFader;
 
     SoundState mState;
@@ -57,5 +66,7 @@ private:
     double mVolume;
 	bool mStopRequest;
 	bool mPauseRequest;
+
+	std::vector<Token> mGroupSubscriptionTokens;
 };
 

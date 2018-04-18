@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
 	// Create a main window with a UI
 	sf::RenderWindow window(sf::VideoMode(), "SFML Audio Engine", sf::Style::Titlebar | sf::Style::Close);
-    UserInterface ui { window, audioManager, Mock::GetSoundsDescriptions() };
+	UserInterface ui{ window, audioManager, Mock::GetSoundsDescriptions(),Mock::GetGroupSettings() };
 
 	// Shrink window size to fit available sounds and available features
 	window.setSize(sf::Vector2u{ ui.GetUiWidth(), ui.GetUiHeight() });

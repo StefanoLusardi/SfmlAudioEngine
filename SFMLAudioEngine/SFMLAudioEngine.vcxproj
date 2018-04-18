@@ -138,6 +138,7 @@
     <ClCompile Include="AudioEngine.cpp" />
     <ClCompile Include="AudioFader.cpp" />
     <ClCompile Include="AudioManager.cpp" />
+    <ClCompile Include="Group.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SoundInstance.cpp" />
     <ClCompile Include="UserInterface.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="AudioFader.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Group.h" />
+    <ClInclude Include="GroupProperty.h" />
     <ClInclude Include="ISoundSource.h" />
     <ClInclude Include="Mixer.h" />
     <ClInclude Include="Mock.h" />
@@ -154,6 +156,7 @@
     <ClInclude Include="Oscillator.h" />
     <ClInclude Include="PolicyBasedQueue.h" />
     <ClInclude Include="PolyphonyManager.h" />
+    <ClInclude Include="Publisher.h" />
     <ClInclude Include="Snapshot.h" />
     <ClInclude Include="SoundDescription.h" />
     <ClInclude Include="SoundEffect.h" />

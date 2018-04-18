@@ -106,3 +106,8 @@ void AudioManager::SetListenerUpVector(const Vector3d& vUp) const
 {
 	mAudioEngine->SetListenerUpVector(vUp);
 }
+
+void AudioManager::SetGroupVolume(const std::string& groupName, const double volume) const
+{
+	mAudioEngine->SetGroupVolume(groupName, volume);
+}

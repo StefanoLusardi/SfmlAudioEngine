@@ -27,17 +27,33 @@ void UserInterface::CreateButton(
 
 UserInterface::UserInterface(sf::RenderWindow& parent, 
 	AudioManager& audioManager, 
-	const std::vector<SoundDescription>& soundsDescriptions)
+	const std::vector<SoundDescription>& soundsDescriptions,
+	const std::vector<std::tuple<const GroupId, const int, const Stealing>>& groupSettings)
     : mParent{parent}
     , mAudioManager{audioManager}
     , mSoundDescriptions{soundsDescriptions}
+	, mGroupSettings{groupSettings}
 {
     mFont.loadFromFile("../Font/arial.ttf");
     auto xPosition = sButtonDelta;
 
 	// Global Engine controls
+	for (const auto& [groupName, groupPolyphony, groupStealing] : mGroupSettings)
     {
-	    
+		int rowNumber = 0;
+		CreateButton(mGroupVolumeUpColliderStrip, mGroupVolumeUpButtonStrip, sf::Color::Green, xPosition, rowNumber++);
+		CreateButton(mGroupVolumeDwColliderStrip, mGroupVolumeDwButtonStrip, sf::Color::Red, xPosition, rowNumber);
+
+		// Font               
+		auto text = std::make_shared<sf::Text>();
+		text->setString(groupName);
+		text->setCharacterSize(18);
+		text->setPosition(xPosition, sButtonDelta);
+		text->setFillColor(sf::Color::Black);
+		text->setFont(mFont);
+		mTextStrip.push_back(text);
+
+		xPosition += mButtonSize + sButtonDelta;
     }
 
 	// Sound specific controls
@@ -70,8 +86,31 @@ UserInterface::UserInterface(sf::RenderWindow& parent,
 void UserInterface::onClick(const sf::Vector2i& mousePosition) const
 {
 	// Global Engine controls
+	for (const auto& group : mGroupSettings)
 	{
+		// Group Volume - Up
+		int idx = 0;
+		for (const auto& collider : mGroupVolumeUpColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.SetGroupVolume(std::get<0>(mGroupSettings[idx]), 1.0);
+				return;
+			}
+			++idx;
+		}
 
+		// Group Volume - Down
+		idx = 0;
+		for (const auto& collider : mGroupVolumeDwColliderStrip)
+		{
+			if (collider->contains(mousePosition))
+			{
+				mAudioManager.SetGroupVolume(std::get<0>(mGroupSettings[idx]), 0.2);
+				return;
+			}
+			++idx;
+		}
 	}
 
 	// Sound specific controls
@@ -82,7 +121,7 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition) const
 		{
 			if (collider->contains(mousePosition))
 			{
-				mAudioManager.PlaySound(mSoundDescriptions[idx].mSoundName, { 0, 0, 0 }, 0.0, 1000.0);
+				mAudioManager.PlaySound(mSoundDescriptions[idx].mSoundName, { 0, 0, 0 }, 1.0, 1000.0);
 				return;
 			}
 			++idx;
@@ -188,6 +227,9 @@ void UserInterface::onClick(const sf::Vector2i& mousePosition) const
 
 void UserInterface::draw() const
 {
+	for (const auto& button : mGroupVolumeUpButtonStrip) mParent.draw(*button);
+	for (const auto& button : mGroupVolumeDwButtonStrip) mParent.draw(*button);
+
     for (const auto& button : mPlayButtonStrip)
         mParent.draw(*button);
 
@@ -221,7 +263,9 @@ void UserInterface::draw() const
 
 unsigned int UserInterface::GetUiWidth() const
 {
-	return static_cast<unsigned int>(sButtonDelta + (sButtonDelta + mButtonSize) * mSoundDescriptions.size());
+	const auto soundControlsWidth = sButtonDelta + (sButtonDelta + mButtonSize) * mSoundDescriptions.size();
+	const auto groupControlsWidth = sButtonDelta + (sButtonDelta + mButtonSize) * mGroupSettings.size();
+	return static_cast<unsigned int>(soundControlsWidth + groupControlsWidth);
 }
 
 unsigned int UserInterface::GetUiHeight() const

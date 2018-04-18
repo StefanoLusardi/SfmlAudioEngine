@@ -43,6 +43,10 @@ public:
 			mSnapshots[snapshotDescription.first] = std::make_unique<Snapshot>(snapshotDescription);
 		}
 	}
+	std::shared_ptr<Group> GetGroup(const GroupId& groupId) const
+	{
+		return std::dynamic_pointer_cast<Group>(mMasterGroup->GetChild(groupId));
+	}
 
 private:
 	std::unique_ptr<Group> mMasterGroup;

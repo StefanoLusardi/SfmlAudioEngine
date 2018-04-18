@@ -5,6 +5,9 @@
 
 #include <memory>
 
+using GroupId = std::string;
+using Stealing = SoundDescription::StealingPolicy;
+
 class AudioManager;
 
 class UserInterface
@@ -13,7 +16,8 @@ public:
     explicit UserInterface(
         sf::RenderWindow& parent
         , AudioManager& audioManager
-        , const std::vector<SoundDescription>& soundsDescriptions);
+        , const std::vector<SoundDescription>& soundsDescriptions
+		, const std::vector<std::tuple<const GroupId, const int, const Stealing>>& groupSettings);
     void onClick(const sf::Vector2i& mousePosition) const;
     void draw() const;
 
@@ -23,14 +27,21 @@ public:
 private:
     sf::RenderWindow& mParent;
     AudioManager& mAudioManager;
-	
+
 	static float sButtonDelta;
 	static float mButtonSize;
 
     sf::Font mFont;
     std::vector<std::shared_ptr<sf::Text>> mTextStrip{};
     std::vector<SoundDescription> mSoundDescriptions;
+	std::vector<std::tuple<const GroupId, const int, const Stealing>> mGroupSettings;
 
+	std::vector<std::shared_ptr<sf::Rect<int>>> mGroupVolumeUpColliderStrip{};
+	std::vector<std::shared_ptr<sf::Rect<int>>> mGroupVolumeDwColliderStrip{};
+
+	std::vector<std::shared_ptr<sf::RectangleShape>> mGroupVolumeUpButtonStrip{};
+	std::vector<std::shared_ptr<sf::RectangleShape>> mGroupVolumeDwButtonStrip{};
+		
     std::vector<std::shared_ptr<sf::Rect<int>>> mPlayColliderStrip{};
 	std::vector<std::shared_ptr<sf::Rect<int>>> mStopColliderStrip{};
 	std::vector<std::shared_ptr<sf::Rect<int>>> mPauseColliderStrip{};
