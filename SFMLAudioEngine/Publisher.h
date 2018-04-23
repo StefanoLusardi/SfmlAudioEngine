@@ -3,7 +3,15 @@
 #include <functional>
 #include <map>
 
-using Token = std::pair<PropertyType, int>;
+using TokenId = int;
+
+struct Token
+{
+	Token(const PropertyType& propertyType, const TokenId& Id) : mPropertyType{ propertyType }, mId{ Id } { }
+
+	const PropertyType mPropertyType;
+	const TokenId mId;
+};
 
 template <typename Payload>
 class Publisher
@@ -12,26 +20,30 @@ public:
 	template <typename Callback>
 	Token RegisterObserver(const PropertyType& propertyType, Callback&& callbackToRegister)
 	{
-		auto tokenId = mObservers[propertyType].size();
-		mObservers[propertyType].push_back(std::forward<Callback>(callbackToRegister));
-		return std::make_pair(propertyType, tokenId);
+		mObservers[propertyType].emplace(mTokenId, std::forward<Callback>(callbackToRegister));
+		return Token(propertyType, mTokenId++);
 	}
 
 	bool UnregisterObserver(Token&& token)
 	{
-		if (auto callbackList = mObservers.find(token.first); callbackList != mObservers.end())
+		// Lookup PropertyType
+		if (auto callbackMap = mObservers.find(token.mPropertyType); callbackMap != mObservers.end())
 		{			
-			callbackList->second.erase(callbackList->second.begin() + token.second);
-			return true;
+			// Lookup TokenId
+			if (auto callback = callbackMap->second.find(token.mId); callback != callbackMap->second.end())
+			{
+				callbackMap->second.erase(callback);
+				return true;
+			}
 		}
 		return false;
 	}
 
 	void Notify(const PropertyType& propertyType, const Payload& value) const
 	{
-		if (auto callbackList = mObservers.find(propertyType); callbackList != mObservers.end())
+		if (auto callbackMap = mObservers.find(propertyType); callbackMap != mObservers.end())
 		{
-			for (const auto& callback : callbackList->second)
+			for (const auto& [tokenId, callback] : callbackMap->second)
 			{
 				callback(value);
 			}
@@ -39,5 +51,6 @@ public:
 	}
 
 private:
-	std::map<PropertyType, std::vector<std::function<void(Payload)>>> mObservers;
+	std::map<PropertyType, std::map<TokenId, std::function<void(Payload)>>> mObservers;
+	inline static TokenId mTokenId { 0 };
 };

@@ -42,7 +42,7 @@ void AudioManager::SetSoundPitch(const std::string& soundName, const double pitc
     mAudioEngine->SetSoundPitch(soundName, pitch, isIncremental);
 }
 
-void AudioManager::SetSoundPosition(const std::string& soundName, const Vector3d& position,	const bool isIncremental) const
+void AudioManager::SetSoundPosition(const std::string& soundName, const Vector3D& position,	const bool isIncremental) const
 {
 	mAudioEngine->SetSoundPosition(soundName, position, isIncremental);
 }
@@ -72,7 +72,7 @@ void AudioManager::UnloadSound(const std::string& soundName) const
     mAudioEngine->UnloadSound(soundName);
 }
 
-void AudioManager::PlaySound(const std::string& soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds) const
+void AudioManager::PlaySound(const std::string& soundName, const Vector3D& position, const double volume, const double fadeinMilliseconds) const
 {
     mAudioEngine->PlaySound(soundName, position, volume, fadeinMilliseconds);
 }
@@ -92,17 +92,17 @@ void AudioManager::SetGlobalVolume(const double globalVolume) const
 	mAudioEngine->SetGlobalVolume(globalVolume);
 }
 
-void AudioManager::SetListenerPosition(const Vector3d& vPosition) const
+void AudioManager::SetListenerPosition(const Vector3D& vPosition) const
 {
 	mAudioEngine->SetListenerPosition(vPosition);
 }
 
-void AudioManager::SetListenerDirection(const Vector3d& vDirection) const
+void AudioManager::SetListenerDirection(const Vector3D& vDirection) const
 {
 	mAudioEngine->SetListenerDirection(vDirection);
 }
 
-void AudioManager::SetListenerUpVector(const Vector3d& vUp) const
+void AudioManager::SetListenerUpVector(const Vector3D& vUp) const
 {
 	mAudioEngine->SetListenerUpVector(vUp);
 }

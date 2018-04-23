@@ -98,8 +98,10 @@ class Oscillator : public ISoundSource
     friend class SoundFactory;
 
 public:
-    ~Oscillator() override
-    { }
+	~Oscillator() override = default;
+
+	std::shared_ptr<ISoundSource> Clone() const override { return std::shared_ptr<Oscillator>(CloneImplementation()); }
+	Oscillator* CloneImplementation() const { return nullptr; }
 
     void Play() override  { mOscillator->play(); }
     void Stop() override  { mOscillator->stop(); }
@@ -108,20 +110,22 @@ public:
     void SetLoop(const bool /*isLoop*/) override { /* Oscillators are always looping by definition */ }
     void SetPitch(const double pitch) override   { mOscillator->setPitch(pitch); }
     void SetVolume(const double volume) override { mOscillator->setVolume(volume); }
-	void SetPosition(const AudioUtils::Vector3d& position) override { mOscillator->setPosition(position.x, position.y, position.z); }
+	void SetPosition(const AudioUtils::Vector3D& position) override { mOscillator->setPosition(position.x, position.y, position.z); }
 	
     double GetPitch() override { return mOscillator->getPitch(); }
     double GetVolume() override { return mOscillator->getVolume(); }
-	AudioUtils::Vector3d GetPosition() override { return AudioUtils::Vector3d(mOscillator->getPosition()); }
+	AudioUtils::Vector3D GetPosition() override { return AudioUtils::Vector3D(mOscillator->getPosition()); }
 
 	bool IsSourcePlaying() override { return mOscillator->getStatus(); }
 	bool IsMono() override { return true; }
 
 private:
     Oscillator(const SoundDescription& soundDescription) 
-    : mOscillator { std::make_unique<StreamOscillator>() }
+	: ISoundSource{ soundDescription }
+    , mOscillator { std::make_unique<StreamOscillator>() }
     {
         Oscillator::SetLoop(soundDescription.mIsLoop);
+		Oscillator::SetPitch(soundDescription.mDefaultPitch);
         Oscillator::SetVolume(soundDescription.mDefaultVolume);
 
     	mOscillator->setRelativeToListener(false);
@@ -131,10 +135,6 @@ private:
 			mOscillator->setAttenuation(DistanceToAttenuation(soundDescription.mMaxDistance, soundDescription.mMinDistance));
 			mOscillator->setMinDistance(soundDescription.mMinDistance);
 		}
-
-		mOscillator->setLoop(soundDescription.mIsLoop);
-		mOscillator->setPitch(soundDescription.mDefaultPitch);
-		mOscillator->setVolume(soundDescription.mDefaultVolume);
     }
 
     std::unique_ptr<StreamOscillator> mOscillator;

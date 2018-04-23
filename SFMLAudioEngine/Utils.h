@@ -3,14 +3,39 @@
 
 namespace AudioUtils
 {
-    struct Vector3d
+    struct Vector3D
     {
-		Vector3d(const double x = 0, const double y = 0, const double z = 0) : x{ x }, y{ y }, z{ z } {}
-		Vector3d(const sf::Vector3f& vector) : x{ vector.x }, y{ vector.y }, z{ vector.z } {}
-		Vector3d(const     Vector3d& vector) : x{ vector.x }, y{ vector.y }, z{ vector.z } {}
-		
-		//Vector3d operator+ (const Vector3d&& vec) const { return Vector3d(this->x + vec.x, this->y + vec.y, this->z + vec.z); }
-		Vector3d& operator+=(const Vector3d& vec) 
+		Vector3D(const double x = 0, const double y = 0, const double z = 0) : x{ x }, y{ y }, z{ z } {}
+
+		Vector3D(const sf::Vector3f& vector) : x{ vector.x }, y{ vector.y }, z{ vector.z } {}
+		Vector3D(const     Vector3D& vector) : x{ vector.x }, y{ vector.y }, z{ vector.z } {}	
+    	
+		Vector3D(sf::Vector3f&& vector) noexcept : x{ vector.x }, y{ vector.y }, z{ vector.z } {}
+		Vector3D(    Vector3D&& vector) noexcept : x{ vector.x }, y{ vector.y }, z{ vector.z } {}
+
+    	Vector3D& operator=(const Vector3D& vector)
+		{
+			if (this == &vector)
+				return *this;
+
+			x = vector.x;
+			y = vector.y;
+			z = vector.z;
+			return *this;
+		}
+
+		Vector3D& operator=(Vector3D&& vector) noexcept
+		{
+			if (this == &vector)
+				return *this;
+
+			x = vector.x;
+			y = vector.y;
+			z = vector.z;
+			return *this;
+		}
+
+		Vector3D& operator+=(const Vector3D& vec) 
     	{
 			this->x = this->x + vec.x;
 			this->y = this->y + vec.y;

@@ -17,14 +17,14 @@ namespace Mock
         return
         {
         //  { "SoundName", SoundType,    MixerGroup, Volume, Pitch minDist, maxDist, Loop,  3D    },
-			//{ "crash",     Type::SFX,    "Drums",    100.0,  1.0,  1.0,     100.0,   false, false },
-			//{ "hihat",     Type::SFX,    "Drums",    100.0,  1.0,  1.0,     100.0,   false, false },
-			//{ "snare",     Type::SFX,    "Drums",    100.0,  1.0,  1.0,     100.0,   false, false },
-			//{ "kick",      Type::SFX,    "Drums",    100.0,  1.0,  1.0,     100.0,   false, false },
+			{ "crash",     Type::SFX,    "Drums",    100.0,  1.0,  1.0,     100.0,   false, false },
+			{ "hihat",     Type::SFX,    "Drums",    100.0,  1.0,  1.0,     100.0,   false, false },
+			{ "snare",     Type::SFX,    "Drums",    100.0,  1.0,  1.0,     100.0,   false, false },
+			{ "kick",      Type::SFX,    "Drums",    100.0,  1.0,  1.0,     100.0,   false, false },
 
-            //{ "Get_Loopy", Type::STREAM, "Music",    100.0,  1.0,  1.0,     100.0,   true,  false },
+            { "Get_Loopy", Type::STREAM, "Music",    100.0,  1.0,  1.0,     100.0,   true,  false },
 
-            //{ "SineOsc",   Type::OSC,    "Osc",      100.0,  1.0,  1.0,     100.0,   true,  false },
+            { "SineOsc",   Type::OSC,    "Osc",      100.0,  1.0,  1.0,     100.0,   true,  false },
 
 			{ "sfx_1",	   Type::SFX,	 "Sfx",      100.0,  1.0,  1.0,     100.0,   true,  false },
 			{ "sfx_2",	   Type::SFX,    "Sfx",      100.0,  1.0,  1.0,     100.0,   true,  false },
@@ -36,13 +36,13 @@ namespace Mock
 			{ "ui_2",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
 			{ "ui_3",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
 			{ "ui_4",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
-			//{ "ui_5",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
-			//{ "ui_6",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
-			//{ "ui_7",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
-			//{ "ui_8",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
-			//{ "ui_9",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
-			//{ "ui_10",     Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
-			//{ "ui_11",     Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
+			{ "ui_5",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
+			{ "ui_6",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
+			{ "ui_7",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
+			{ "ui_8",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
+			{ "ui_9",      Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
+			{ "ui_10",     Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
+			{ "ui_11",     Type::SFX,	 "Ui",       100.0,  1.0,  1.0,     100.0,   false, true },
         };
     }
 
@@ -53,7 +53,7 @@ namespace Mock
 			{ "Drums",  4, Stealing::NONE   },
 			{ "Music",  2, Stealing::NONE	},
 			{ "Osc",    5, Stealing::OLDEST },
-			{ "Sfx",    1, Stealing::OLDEST },
+			{ "Sfx",    3, Stealing::OLDEST },
 			{ "Voices", 1, Stealing::NONE	},
 			{ "Ui",     3, Stealing::OLDEST },
 		};

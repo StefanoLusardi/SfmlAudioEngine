@@ -81,7 +81,6 @@ void AudioEngine::LoadSound(const std::string& soundName)
 {
     // Check if a sound source is already loaded in the mSoundSources map
     // if so return, otherwise create a sound source to be later used by a sound instance
-
     const auto sound = FindSound(soundName);
     if (sound == mSounds.end())
         return;
@@ -112,11 +111,13 @@ void AudioEngine::Update(const std::chrono::duration<double, std::milli> updateT
             stoppedInstances.push_back(activeInstance);
     }
 
+	// Stopped Instance Garbage Collector
     for (auto& stoppedInstance : stoppedInstances)
-    {
-		// Remove the stopped instance from Polyphony Manager
-		mPolyphonyManager.Pop(stoppedInstance->second->GetSoundDescription().mMixerGroup);
-		
+    {		
+		// Remove the stopped instance from Polyphony Manager if it is not already been cleaned up while pushing into it a new instance
+		if (!stoppedInstance->second->IsCleanedUp())
+			mPolyphonyManager.Pop(stoppedInstance->second->GetSoundDescription().mMixerGroup);		
+
     	// Unregister the stopped instance from its Groups
 		for (auto& token : stoppedInstance->second->GetTokens())
 			mMixer.GetGroup(stoppedInstance->second->GetSoundDescription().mMixerGroup)->UnregisterObserver(std::move(token));
@@ -126,7 +127,7 @@ void AudioEngine::Update(const std::chrono::duration<double, std::milli> updateT
     }
 }
 
-SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds)
+SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3D& position, const double volume, const double fadeinMilliseconds)
 {
 	// Check that the sound is loaded
     const auto sound = FindSound(soundName);
@@ -150,7 +151,7 @@ SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& pos
 	auto removedInstanceId{ 0 };
 	if (mPolyphonyManager.Push(sound->first.mMixerGroup, mNextInstanceId, std::move(removedInstanceId)))
 	{
-		mInstances[mNextInstanceId] = std::make_unique<SoundInstance>(*this, sound, position, volume);
+		mInstances[mNextInstanceId] = std::make_unique<SoundInstance>(*this, sound, position, volume);		
 
 		// Subscribe the new instance as an Observer of its Mixer Group
 		auto token = mMixer.GetGroup(sound->first.mMixerGroup)->RegisterObserver(PropertyType::VOLUME,
@@ -164,9 +165,12 @@ SoundId AudioEngine::PlaySound(const std::string& soundName, const Vector3d& pos
 		// If pushing a new instance in the Polyphony Manager an old instance is removed we need to stop it
 		if (removedInstanceId)
 		{
-			const auto fadeoutMilliseconds { 500 }; // Default fadeout time for instances removed from Polyphony Manager
+			// Default fadeout time for instances removed from Polyphony Manager
+			const auto fadeoutMilliseconds { 500 }; 
 			mInstances[removedInstanceId]->StartFade(fadeoutMilliseconds, 0.0f);
 			mInstances[removedInstanceId]->SetStopRequest(true);
+
+			mInstances[removedInstanceId]->IsCleanedUp(true);
 		}
 
 		mNextInstanceId++;
@@ -235,7 +239,7 @@ void AudioEngine::SetSoundPitch(const std::string& soundName, const double pitch
     sound->second->SetPitch(pitch, isIncremental);
 }
 
-void AudioEngine::SetSoundPosition(const std::string& soundName, const Vector3d& position, const bool isIncremental)
+void AudioEngine::SetSoundPosition(const std::string& soundName, const Vector3D& position, const bool isIncremental)
 {
 	const auto sound = FindInstance(soundName);
 	if (sound == mInstances.end())
@@ -249,22 +253,22 @@ void AudioEngine::SetGlobalVolume(const double globalVolume) const
 	sf::Listener::setGlobalVolume(globalVolume);
 }
 
-void AudioEngine::SetListenerPosition(const Vector3d& vPosition) const
+void AudioEngine::SetListenerPosition(const Vector3D& vPosition) const
 {
 	sf::Listener::setPosition(vPosition.x, vPosition.y, vPosition.z);
 }
 
-void AudioEngine::SetListenerDirection(const Vector3d& vDirection) const
+void AudioEngine::SetListenerDirection(const Vector3D& vDirection) const
 {
 	sf::Listener::setDirection(vDirection.x, vDirection.y, vDirection.z);
 }
 
-void AudioEngine::SetListenerUpVector(const Vector3d& vUp) const
+void AudioEngine::SetListenerUpVector(const Vector3D& vUp) const
 {
 	sf::Listener::setUpVector(vUp.x, vUp.y, vUp.z);
 }
 
-void AudioEngine::SetGroupVolume(const std::string & groupName, const double volume)
+void AudioEngine::SetGroupVolume(const std::string & groupName, const double volume) const
 {
 	mMixer.GetGroup(groupName)->SetVolume(volume);
 }

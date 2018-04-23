@@ -31,7 +31,7 @@ public:
     void LoadSound(const std::string& soundName) const;
     void UnloadSound(const std::string& soundName) const;
 
-    void PlaySound(const std::string& soundName, const Vector3d& position, const double volume, const double fadeinMilliseconds) const;
+    void PlaySound(const std::string& soundName, const Vector3D& position, const double volume, const double fadeinMilliseconds) const;
     void StopSound(const std::string& soundName, const double fadeoutMilliseconds) const;
     void PauseSound(const std::string& soundName, const double fadeoutMilliseconds) const;
 
@@ -39,16 +39,16 @@ public:
 
     void SetSoundVolume(const std::string& soundName, const double volume, const bool isIncremental) const;
     void SetSoundPitch(const std::string& soundName, const double pitch, const bool isIncremental) const;
-	void SetSoundPosition(const std::string& soundName, const Vector3d& position, const bool isIncremental) const;
+	void SetSoundPosition(const std::string& soundName, const Vector3D& position, const bool isIncremental) const;
 
 	void StopAllSounds() const;
 	void PauseAllSounds() const;
 	void ResumeAllSounds() const;
 	void SetGlobalVolume(const double globalVolume) const;
 
-	void SetListenerPosition(const Vector3d& vPosition) const;
-	void SetListenerDirection(const Vector3d& vDirection) const;
-	void SetListenerUpVector(const Vector3d& vUp) const;
+	void SetListenerPosition(const Vector3D& vPosition) const;
+	void SetListenerDirection(const Vector3D& vDirection) const;
+	void SetListenerUpVector(const Vector3D& vUp) const;
 
 	void SetGroupVolume(const std::string& groupName, const double volume) const;
 

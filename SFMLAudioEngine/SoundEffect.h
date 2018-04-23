@@ -10,8 +10,10 @@ class SoundEffect : public ISoundSource
     friend SoundFactory;
 
 public:
-    ~SoundEffect() override
-    { }
+	~SoundEffect() override = default;
+
+	std::shared_ptr<ISoundSource> Clone() const override { return std::shared_ptr<SoundEffect>(CloneImplementation()); }
+	SoundEffect* CloneImplementation() const { return new SoundEffect(*this); }
 
     void Play() override  { mSound.play(); }
     void Stop() override  { mSound.stop(); }
@@ -22,8 +24,8 @@ public:
     void SetVolume(const double volume) override { mSound.setVolume(volume); }
 	
 	// Spatialization works only for mono sounds
-	void SetPosition(const AudioUtils::Vector3d& position) override { mSound.setPosition(position.x, position.y, position.z); }
-	AudioUtils::Vector3d GetPosition() override { return AudioUtils::Vector3d(mSound.getPosition()); }
+	void SetPosition(const AudioUtils::Vector3D& position) override { mSound.setPosition(position.x, position.y, position.z); }
+	AudioUtils::Vector3D GetPosition() override { return AudioUtils::Vector3D(mSound.getPosition()); }
 
     double GetPitch() override { return mSound.getPitch(); }
     double GetVolume() override { return mSound.getVolume(); }
@@ -32,28 +34,23 @@ public:
 	bool IsMono() override { return mSound.getBuffer()->getChannelCount() == 1; }
 
 private:
-    SoundEffect(const SoundDescription& soundDescription)
+    SoundEffect(const SoundDescription& soundDescription) 
+	: ISoundSource{ soundDescription }
     {
         mBuffer.loadFromFile("../AudioSamples/" + soundDescription.mSoundName + ".wav");
         mSound.setBuffer(mBuffer);
-        SoundEffect::SetLoop(soundDescription.mIsLoop);
+
+		SoundEffect::SetLoop(soundDescription.mIsLoop);
+		SoundEffect::SetPitch(soundDescription.mDefaultPitch);
+		SoundEffect::SetVolume(soundDescription.mDefaultVolume);
 
 		if (soundDescription.mIs3d && SoundEffect::IsMono())
 		{
 			mSound.setAttenuation(DistanceToAttenuation(soundDescription.mMaxDistance, soundDescription.mMinDistance));
 			mSound.setMinDistance(soundDescription.mMinDistance);
 		}
-
-		mSound.setLoop(soundDescription.mIsLoop);
-		mSound.setPitch(soundDescription.mDefaultPitch);
-		mSound.setVolume(soundDescription.mDefaultVolume);
     }
-
-    SoundEffect(const sf::Sound& sound, const sf::SoundBuffer& buffer)
-    : mSound{sound}
-    , mBuffer{buffer}
-    { }
-
-    sf::Sound       mSound;
+	
+	sf::Sound       mSound;
     sf::SoundBuffer mBuffer;
 };

@@ -11,15 +11,14 @@ std::map<SoundDescription::SoundType, std::function<std::unique_ptr<ISoundSource
 
 SoundInstance::SoundInstance(AudioEngine& engine
     , const std::map<const SoundDescription, std::shared_ptr<ISoundSource>>::iterator sound
-    , const Vector3d& position
+    , const Vector3D& position
     , const double volume)
       : mEngine{engine}
 	  , mSoundDescription{ sound->first }
-      , mSoundSource{sound->second}
+      , mSoundSource{sound->second->Clone()}
 	  , mFader{nullptr}
       , mState{SoundState::INITIALIZE}
       , mPosition{position}
-      , mVolume{volume}
       , mStopRequest{false}
 	  , mPauseRequest{false}
 {
@@ -105,7 +104,7 @@ void SoundInstance::SetPitch(const double pitch, const bool isIncremental) const
     mSoundSource->SetPitch(newPitch);
 }
 
-void SoundInstance::SetPosition(const Vector3d& position, const bool isIncremental) const 
+void SoundInstance::SetPosition(const Vector3D& position, const bool isIncremental) const 
 {
 	if (!isIncremental)
 	{
@@ -138,16 +137,17 @@ std::vector<Token> SoundInstance::GetTokens() const
 */
 void SoundInstance::OnGroupUpdate(const GroupProperty& groupProperty)
 {
-	const auto interpolationTime = 100.0; // [ms]
+	// Default interpolation time for smooth volume changes
+	const auto fadeTimeMilliseconds{ 100.0 };
 
 	switch (groupProperty.mPropertyType)
 	{
 	case PropertyType::MUTE: 
-		std::get<bool>(groupProperty.mValue) ? StartFade(interpolationTime, 1.0) : StartFade(interpolationTime, 0.0);
+		std::get<bool>(groupProperty.mValue) ? StartFade(fadeTimeMilliseconds, 1.0) : StartFade(fadeTimeMilliseconds, 0.0);
 		break;
 
 	case PropertyType::VOLUME : 
-		StartFade(interpolationTime, std::get<double>(groupProperty.mValue));
+		StartFade(fadeTimeMilliseconds, std::get<double>(groupProperty.mValue));
 		break;
 
 	case PropertyType::PITCH : 
@@ -168,7 +168,7 @@ void SoundInstance::SetPitch(const double pitch) const
 	mSoundSource->SetPitch(pitch);
 }
 
-void SoundInstance::SetPosition(const Vector3d& position) const
+void SoundInstance::SetPosition(const Vector3D& position) const
 {
 	mSoundSource->SetPosition(position);
 }
