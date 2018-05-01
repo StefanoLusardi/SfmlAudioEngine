@@ -24,7 +24,8 @@ namespace Mock
 
             { "Get_Loopy", Type::STREAM, "Music",    100.0,  1.0,  1.0,     100.0,   true,  false },
 
-            { "SineOsc",   Type::OSC,    "Osc",      100.0,  1.0,  1.0,     100.0,   true,  false },
+            { "Sine",	   Type::OSC,    "Osc",      100.0,  1.0,  1.0,     100.0,   true,  false, SoundDescription::OscType::SIN},
+            { "Noise",     Type::OSC,    "Osc",      100.0,  1.0,  1.0,     100.0,   true,  false, SoundDescription::OscType::NOISE},
 
 			{ "sfx_1",	   Type::SFX,	 "Sfx",      100.0,  1.0,  1.0,     100.0,   true,  false },
 			{ "sfx_2",	   Type::SFX,    "Sfx",      100.0,  1.0,  1.0,     100.0,   true,  false },
