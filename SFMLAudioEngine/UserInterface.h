@@ -21,8 +21,8 @@ public:
     void onClick(const sf::Vector2i& mousePosition) const;
     void draw() const;
 
-	unsigned int GetUiWidth()  const;
-	unsigned int GetUiHeight() const;
+	unsigned GetUiWidth() const;
+	unsigned GetUiHeight() const;
 
 private:
     sf::RenderWindow& mParent;

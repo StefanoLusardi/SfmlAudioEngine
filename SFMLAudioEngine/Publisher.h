@@ -45,6 +45,7 @@ public:
 		{
 			for (const auto& [tokenId, callback] : callbackMap->second)
 			{
+				(void) tokenId;
 				callback(value);
 			}
 		}

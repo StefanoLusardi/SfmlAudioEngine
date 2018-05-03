@@ -12,8 +12,7 @@ class SoundEffect : public ISoundSource
 public:
 	~SoundEffect() override = default;
 
-	std::shared_ptr<ISoundSource> Clone() const override { return std::shared_ptr<SoundEffect>(CloneImplementation()); }
-	SoundEffect* CloneImplementation() const { return new SoundEffect(*this); }
+	std::shared_ptr<ISoundSource> Clone() const override { return std::shared_ptr<SoundEffect>(new SoundEffect(*this)); }
 
     void Play() override  { mSound.play(); }
     void Stop() override  { mSound.stop(); }

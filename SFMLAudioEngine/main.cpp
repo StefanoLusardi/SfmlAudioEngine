@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
 	// Shrink window size to fit available sounds and available features
 	window.setSize(sf::Vector2u{ ui.GetUiWidth(), ui.GetUiHeight() });
-	window.setView(sf::View(sf::FloatRect(0, 0, ui.GetUiWidth(), ui.GetUiHeight())));
+	window.setView(sf::View(sf::FloatRect(0, 0, (float)ui.GetUiWidth(), (float)ui.GetUiHeight())));
 
 	// Initialize tic-toc to compute elapsed time at each game tick
     auto start = std::chrono::system_clock::now();

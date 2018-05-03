@@ -140,6 +140,8 @@
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Group.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mixer.cpp" />
+    <ClCompile Include="PolyphonyManager.cpp" />
     <ClCompile Include="SoundInstance.cpp" />
     <ClCompile Include="UserInterface.cpp" />
   </ItemGroup>

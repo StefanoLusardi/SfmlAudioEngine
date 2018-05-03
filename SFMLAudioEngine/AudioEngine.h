@@ -9,7 +9,7 @@
 #include <vector>
 #include <chrono>
 
-class AudioEngine
+class AudioEngine final
 {
 public:
     explicit AudioEngine(Mixer& mixer, PolyphonyManager& polyphonyManager);

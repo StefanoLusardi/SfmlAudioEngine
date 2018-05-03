@@ -13,7 +13,7 @@
 
 class PolyphonyManager;
 
-class AudioManager
+class AudioManager final
 {
 public:
     explicit AudioManager(Mixer& mixer, PolyphonyManager& polyphonyManager);

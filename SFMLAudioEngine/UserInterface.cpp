@@ -40,6 +40,9 @@ UserInterface::UserInterface(sf::RenderWindow& parent,
 	// Global Engine controls
 	for (const auto& [groupName, groupPolyphony, groupStealing] : mGroupSettings)
     {
+		(void) groupPolyphony;
+		(void) groupStealing;
+
 		int rowNumber = 0;
 		CreateButton(mGroupVolumeUpColliderStrip, mGroupVolumeUpButtonStrip, sf::Color::Green, xPosition, rowNumber++);
 		CreateButton(mGroupVolumeDwColliderStrip, mGroupVolumeDwButtonStrip, sf::Color::Red, xPosition, rowNumber);
@@ -261,14 +264,14 @@ void UserInterface::draw() const
         mParent.draw(*text);
 }
 
-unsigned int UserInterface::GetUiWidth() const
+unsigned UserInterface::GetUiWidth() const
 {
 	const auto soundControlsWidth = sButtonDelta + (sButtonDelta + mButtonSize) * mSoundDescriptions.size();
 	const auto groupControlsWidth = sButtonDelta + (sButtonDelta + mButtonSize) * mGroupSettings.size();
 	return static_cast<unsigned int>(soundControlsWidth + groupControlsWidth);
 }
 
-unsigned int UserInterface::GetUiHeight() const
+unsigned UserInterface::GetUiHeight() const
 {
 	return static_cast<unsigned int>(sButtonDelta + (sButtonDelta + mButtonSize) * mControlsNumber);
 }
