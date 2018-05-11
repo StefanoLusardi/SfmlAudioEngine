@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Snapshot.h"
 #include "Group.h"
 

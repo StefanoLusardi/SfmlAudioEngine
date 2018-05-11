@@ -1,9 +1,11 @@
 #pragma once
 
+#include "API.h"
+
 #include "Snapshot.h"
 #include "Group.h"
 
-class Mixer final
+class SL_API Mixer final
 {
 public:
 	explicit Mixer(const std::pair<GroupId, std::vector<GroupId>>& masterGroup,

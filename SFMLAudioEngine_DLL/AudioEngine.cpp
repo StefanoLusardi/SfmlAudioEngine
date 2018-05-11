@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "AudioEngine.h"
 #include "SoundFactory.h"
 
